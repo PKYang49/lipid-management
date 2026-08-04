@@ -155,6 +155,8 @@ legend{
 .v-grid dd{margin:0;font-variant-numeric:tabular-nums}
 .big{font-size:19px;font-weight:650;font-variant-numeric:tabular-nums}
 .status{display:inline-flex;gap:6px;margin-top:13px;padding:6px 10px;border-radius:2px;font-size:12.5px;font-weight:600}
+.status-stack{display:flex;flex-direction:column;align-items:flex-start;gap:6px;margin-top:13px}
+.status-stack .status{margin-top:0}
 .status.ok{background:var(--ok-soft);color:var(--ok)}
 .status.bad{background:var(--bad-soft);color:var(--bad)}
 .status.na{background:var(--panel-2);color:var(--ink-3);font-weight:400}
@@ -610,26 +612,16 @@ function statusEl(cur,target){
   if(d<0)return '<div class="status ok">已達標　'+cur+' &lt; '+target+'</div>';
   return '<div class="status bad">未達標　差 '+d.toFixed(0)+' mg/dL</div>';
 }
+function oldMetricStatus(label,cur,target){
+  if(cur===null)return '<div class="status na">'+label+' 未輸入</div>';
+  if(cur<target)return '<div class="status ok">'+label+' 已達標　'+cur+' &lt; '+target+'</div>';
+  return '<div class="status bad">'+label+' 未達標　差 '+(cur-target).toFixed(0)+' mg/dL</div>';
+}
 function oldStatusEl(s,O){
-  const ldlOk=s.ldl!==null&&s.ldl<O.ldl;
-  const tcOk=O.tc!==null&&s.tc!==null&&s.tc<O.tc;
-  if(ldlOk||tcOk){
-    const achieved=[];
-    if(ldlOk)achieved.push('LDL-C '+s.ldl+' < '+O.ldl);
-    if(tcOk)achieved.push('TC '+s.tc+' < '+O.tc);
-    return '<div class="status ok">已達標　'+achieved.join(' 或 ')+'</div>';
-  }
-  if(O.tc!==null&&s.ldl!==null&&s.tc===null)
-    return '<div class="status na">LDL-C 未達標；未填 TC，無法排除 TC 已達標</div>';
-  if(O.tc!==null&&s.ldl===null&&s.tc!==null)
-    return '<div class="status na">TC 未達標；未填 LDL-C，無法排除 LDL-C 已達標</div>';
-  if(O.tc!==null)
-    return '<div class="status na">未填 TC 與 LDL-C，無法判定是否達標</div>';
-  if(s.ldl===null)return '<div class="status na">未輸入 LDL-C</div>';
-  if(O.tc===null){
-    return '<div class="status bad">未達標　差 '+(s.ldl-O.ldl).toFixed(0)+' mg/dL</div>';
-  }
-  return '<div class="status bad">未達標　LDL-C 差 '+(s.ldl-O.ldl).toFixed(0)+'、TC 差 '+(s.tc-O.tc).toFixed(0)+' mg/dL</div>';
+  const metrics=[];
+  if(O.tc!==null)metrics.push(oldMetricStatus('TC',s.tc,O.tc));
+  metrics.push(oldMetricStatus('LDL-C',s.ldl,O.ldl));
+  return '<div class="status-stack">'+metrics.join('')+'</div>';
 }
 const fmtDate=d=>(d.getMonth()+1)+"/"+d.getDate();
 const plusWeeks=w=>{const d=new Date();d.setDate(d.getDate()+w*7);return d;};
