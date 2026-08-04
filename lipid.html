@@ -683,8 +683,7 @@ function render(){
       "，<b>舊制仍須計算危險因子</b>——請填下方欄位。"+
       (missing.length?"尚需填寫：<b>"+missing.join("、")+"</b>；未填資料不視為沒有風險。":"");
   }else if(missing.length){
-    lock.innerHTML="目前仍需依心血管風險因子判定；以下欄位已展開，尚需填寫：<b>"+
-      missing.join("、")+"</b>。未填資料不視為沒有風險。";
+    lock.innerHTML="請填寫心血管風險因子及相關數據以完成判定。";
   }
 
 
