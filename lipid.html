@@ -619,8 +619,12 @@ function oldStatusEl(s,O){
     if(tcOk)achieved.push('TC '+s.tc+' < '+O.tc);
     return '<div class="status ok">已達標　'+achieved.join(' 或 ')+'</div>';
   }
-  if(O.tc!==null&&(s.ldl===null||s.tc===null))
-    return '<div class="status na">資料不足，無法以 TC 或 LDL-C 判定</div>';
+  if(O.tc!==null&&s.ldl!==null&&s.tc===null)
+    return '<div class="status na">LDL-C 未達標；未填 TC，無法排除 TC 已達標</div>';
+  if(O.tc!==null&&s.ldl===null&&s.tc!==null)
+    return '<div class="status na">TC 未達標；未填 LDL-C，無法排除 LDL-C 已達標</div>';
+  if(O.tc!==null)
+    return '<div class="status na">未填 TC 與 LDL-C，無法判定是否達標</div>';
   if(s.ldl===null)return '<div class="status na">未輸入 LDL-C</div>';
   if(O.tc===null){
     return '<div class="status bad">未達標　差 '+(s.ldl-O.ldl).toFixed(0)+' mg/dL</div>';
