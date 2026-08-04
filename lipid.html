@@ -283,13 +283,15 @@ details.more .dc{padding:0 10px 10px}
           <label class="chk"><input type="checkbox" id="htn"><span>高血壓</span></label>
           <label class="chk"><input type="checkbox" id="famhx"><span>早發性冠心病家族史<span class="hint">男 ≦55 歲，女 ≦65 歲</span></span></label>
           <label class="chk"><input type="checkbox" id="smoke"><span>抽菸</span></label>
-          <label class="chk"><input type="checkbox" id="metsOn"><span>代謝症候群<span class="hint">下列五項符合三項以上；僅新制採計</span></span></label>
-          <div class="sub" id="metsSub">
-            <label class="chk"><input type="checkbox" id="mWaist"><span>腹部肥胖（男 ≧90cm，女 ≧80cm）</span></label>
-            <label class="chk"><input type="checkbox" id="mBp"><span>血壓 ≧130/85 或使用高血壓藥物</span></label>
-            <label class="chk"><input type="checkbox" id="mFpg"><span>空腹血糖 ≧100 或使用糖尿病藥物</span></label>
-            <label class="chk"><input type="checkbox" id="mTgMed"><span>使用治療 TG 之降血脂藥物</span></label>
-            <div class="autos" id="metsAutos"></div>
+          <div id="newRiskFields">
+            <label class="chk"><input type="checkbox" id="metsOn"><span>代謝症候群<span class="hint">下列五項符合三項以上；僅新制採計</span></span></label>
+            <div class="sub" id="metsSub">
+              <label class="chk"><input type="checkbox" id="mWaist"><span>腹部肥胖（男 ≧90cm，女 ≧80cm）</span></label>
+              <label class="chk"><input type="checkbox" id="mBp"><span>血壓 ≧130/85 或使用高血壓藥物</span></label>
+              <label class="chk"><input type="checkbox" id="mFpg"><span>空腹血糖 ≧100 或使用糖尿病藥物</span></label>
+              <label class="chk"><input type="checkbox" id="mTgMed"><span>使用治療 TG 之降血脂藥物</span></label>
+              <div class="autos" id="metsAutos"></div>
+            </div>
           </div>
         </div>
         <div class="autos" id="rfAutos"></div>
@@ -544,11 +546,11 @@ function oldFactors(s){
   if(s.smoke)f.push("吸菸");
   return f;
 }
-function missingRiskData(s){
+function missingRiskData(s,newRiskNeeded){
   const missing=[];
   if(s.age===null)missing.push("年齡");
   if(s.hdl===null)missing.push("HDL-C");
-  if(s.metsOn&&!metsCount(s).met)missing.push("代謝症候群五項資料");
+  if(newRiskNeeded&&s.metsOn&&!metsCount(s).met)missing.push("代謝症候群五項資料");
   return missing;
 }
 function newLevel(s){
@@ -628,11 +630,9 @@ function render(){
     c.setAttribute("aria-pressed",String(c.dataset.id==="__none"?!any:!!cond[c.dataset.id])));
 
   const mc=metsCount(s);
-  $("metsAutos").innerHTML='<span class="auto-chip'+(mc.met?" on":"")+'">符合 '+mc.c+' / 5 項'+(mc.met?"　→ 成立":"")+'</span>'+
+  $("metsAutos").innerHTML='<span class="auto-chip'+(mc.met?" on":"")+'">符合 '+mc.c+' / 5 項'+(mc.met?"　→ 成立":"")+'</span>'+ 
     (mc.items.length?'<span class="auto-chip">'+mc.items.join("・")+'</span>':"");
   const nf=newFactors(s), of=oldFactors(s);
-  $("rfAutos").innerHTML='<span class="auto-chip'+(nf.length?" on":"")+'">新制計得 '+nf.length+' 項</span>'+
-                         '<span class="auto-chip'+(of.length?" on":"")+'">舊制計得 '+of.length+' 項</span>';
 
   const nl=newLevel(s), N=NEW[nl.k];
   const ol=oldLevel(s), O=OLD[ol.k];
@@ -642,7 +642,13 @@ function render(){
   const oldLocked=(ol.k==="A"||ol.k==="B");
   const locked=newLocked&&oldLocked;
   const needRiskData=!locked;
-  const missing=needRiskData?missingRiskData(s):[];
+  const missing=needRiskData?missingRiskData(s,!newLocked):[];
+  $("menoWrap").classList.toggle("hidden",s.sex!=="F"||oldLocked);
+  $("newRiskFields").classList.toggle("hidden",newLocked);
+  const rfSummary=[];
+  if(!newLocked)rfSummary.push('<span class="auto-chip'+(nf.length?" on":"")+'">新制計得 '+nf.length+' 項</span>');
+  if(!oldLocked)rfSummary.push('<span class="auto-chip'+(of.length?" on":"")+'">舊制計得 '+of.length+' 項</span>');
+  $("rfAutos").innerHTML=rfSummary.join("");
   document.querySelectorAll("[data-tier3]").forEach(el=>el.classList.toggle("hidden",!needRiskData));
 
   const notInOld=[];
