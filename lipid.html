@@ -255,7 +255,7 @@ details.more .dc{padding:0 10px 10px}
           <input id="ldl" type="number" min="0" value="">
           <span class="unit">mg/dL</span>
         </div>
-        <details class="more">
+        <details class="more" id="nonLdlFields">
           <summary>TC／HDL-C／TG</summary>
           <div class="dc">
             <div class="row">
@@ -659,6 +659,7 @@ function render(){
   const locked=newLocked&&oldLocked;
   const needRiskData=!locked;
   const missing=needRiskData?missingRiskData(s,!newLocked):[];
+  $("nonLdlFields").open=needRiskData;
   $("menoWrap").classList.toggle("hidden",s.sex!=="F"||oldLocked);
   $("newRiskFields").classList.toggle("hidden",newLocked);
   const rfSummary=[];
