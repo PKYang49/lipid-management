@@ -608,14 +608,14 @@ function oldLevel(s){
 }
 function statusEl(cur,target){
   if(cur===null)return '<div class="status na">未輸入 LDL-C</div>';
-  const d=cur-target;
-  if(d<0)return '<div class="status ok">已達標　'+cur+' &lt; '+target+'</div>';
+  const d=cur-target+1;
+  if(cur<target)return '<div class="status ok">已達標　'+cur+' &lt; '+target+'</div>';
   return '<div class="status bad">未達標　差 '+d.toFixed(0)+' mg/dL</div>';
 }
 function oldMetricStatus(label,cur,target){
   if(cur===null)return '<div class="status na">'+label+' 未輸入</div>';
   if(cur<target)return '<div class="status ok">'+label+' 已達標　'+cur+' &lt; '+target+'</div>';
-  return '<div class="status bad">'+label+' 未達標　差 '+(cur-target).toFixed(0)+' mg/dL</div>';
+  return '<div class="status bad">'+label+' 未達標　差 '+(cur-target+1).toFixed(0)+' mg/dL</div>';
 }
 function oldStatusEl(s,O){
   const metrics=[];
