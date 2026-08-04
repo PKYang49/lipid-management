@@ -1,0 +1,768 @@
+<title>血脂給付判定台</title>
+<style>
+:root{
+  --ground:#EDF1F3; --panel:#FFFFFF; --panel-2:#F6F9FA;
+  --ink:#14212A; --ink-2:#586A75; --ink-3:#8395A0;
+  --line:#D3DDE2; --line-2:#E3EAEE;
+  --new:#00695C; --new-ink:#00594E; --new-soft:#D6E9E5; --new-edge:#8FC7BE;
+  --old:#8C5A17; --old-ink:#7A4E12; --old-soft:#F2E4CD;
+  --ok:#1D6B4A; --ok-soft:#DCEFE4;
+  --bad:#A5211A; --bad-soft:#F7DEDB;
+  --focus:#0F7C8C;
+  --on-accent:#FFFFFF;
+}
+@media (prefers-color-scheme:dark){
+  :root{
+    --ground:#0C1317; --panel:#131D23; --panel-2:#18242B;
+    --ink:#E2EBEF; --ink-2:#93A6B0; --ink-3:#6C7F8A;
+    --line:#26343C; --line-2:#1E2B33;
+    --new:#4FD1BE; --new-ink:#8AE5D7; --new-soft:#0D3B36; --new-edge:#1E6960;
+    --old:#E2A857; --old-ink:#F0C489; --old-soft:#3A2A11;
+    --ok:#5FC891; --ok-soft:#123527;
+    --bad:#F2827A; --bad-soft:#3B1613;
+    --focus:#5AC8DA;
+    --on-accent:#0C1317;
+  }
+}
+:root[data-theme="dark"]{
+  --ground:#0C1317; --panel:#131D23; --panel-2:#18242B;
+  --ink:#E2EBEF; --ink-2:#93A6B0; --ink-3:#6C7F8A;
+  --line:#26343C; --line-2:#1E2B33;
+  --new:#4FD1BE; --new-ink:#8AE5D7; --new-soft:#0D3B36; --new-edge:#1E6960;
+  --old:#E2A857; --old-ink:#F0C489; --old-soft:#3A2A11;
+  --ok:#5FC891; --ok-soft:#123527;
+  --bad:#F2827A; --bad-soft:#3B1613;
+  --focus:#5AC8DA;
+  --on-accent:#0C1317;
+}
+:root[data-theme="light"]{
+  --ground:#EDF1F3; --panel:#FFFFFF; --panel-2:#F6F9FA;
+  --ink:#14212A; --ink-2:#586A75; --ink-3:#8395A0;
+  --line:#D3DDE2; --line-2:#E3EAEE;
+  --new:#00695C; --new-ink:#00594E; --new-soft:#D6E9E5; --new-edge:#8FC7BE;
+  --old:#8C5A17; --old-ink:#7A4E12; --old-soft:#F2E4CD;
+  --ok:#1D6B4A; --ok-soft:#DCEFE4;
+  --bad:#A5211A; --bad-soft:#F7DEDB;
+  --focus:#0F7C8C;
+  --on-accent:#FFFFFF;
+}
+
+*{box-sizing:border-box}
+body{
+  margin:0; background:var(--ground); color:var(--ink);
+  font-family:"PingFang TC","Noto Sans TC","Heiti TC",-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+  font-size:15px; line-height:1.6; -webkit-font-smoothing:antialiased;
+}
+h1,h2,h3{text-wrap:balance;margin:0}
+:focus-visible{outline:2px solid var(--focus);outline-offset:2px;border-radius:3px}
+.wrap{max-width:1200px;margin:0 auto;padding:0 20px 72px}
+.hidden{display:none !important}
+
+.mast{border-bottom:1px solid var(--line);background:var(--panel)}
+.mast-in{max-width:1200px;margin:0 auto;padding:20px 20px 0}
+.eyebrow{font-family:ui-monospace,Menlo,monospace;font-size:10.5px;letter-spacing:.16em;text-transform:uppercase;color:var(--ink-3)}
+.mast h1{font-size:23px;letter-spacing:-.01em;font-weight:650;margin-top:3px}
+.mast p{margin:3px 0 0;color:var(--ink-2);font-size:13px}
+.tabs{max-width:1200px;margin:0 auto;padding:16px 20px 0;display:flex;gap:2px}
+.tabs button{
+  appearance:none;border:1px solid var(--line);border-bottom:0;background:var(--panel-2);
+  font:inherit;font-size:13px;padding:8px 17px;color:var(--ink-2);cursor:pointer;border-radius:2px 2px 0 0;
+  position:relative;top:1px;
+}
+.tabs button[aria-selected="true"]{background:var(--panel);color:var(--ink);font-weight:600}
+
+.cols{display:grid;grid-template-columns:minmax(0,352px) minmax(0,1fr);gap:24px;align-items:start;padding-top:24px}
+@media (max-width:980px){.cols{grid-template-columns:1fr}}
+.solo{padding-top:24px;display:flex;flex-direction:column;gap:20px;max-width:920px}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:2px}
+.card > h2{
+  font-size:11px;letter-spacing:.15em;text-transform:uppercase;font-family:ui-monospace,Menlo,monospace;
+  color:var(--ink-3);padding:12px 16px;border-bottom:1px solid var(--line-2);font-weight:600;
+}
+.card-body{padding:16px}
+.stack{display:flex;flex-direction:column;gap:20px}
+.stack-sm{display:flex;flex-direction:column;gap:9px}
+
+form{display:flex;flex-direction:column}
+fieldset{border:0;border-top:1px solid var(--line-2);margin:0;padding:14px 16px}
+fieldset:first-of-type{border-top:0}
+legend{
+  font-family:ui-monospace,Menlo,monospace;font-size:10.5px;letter-spacing:.14em;text-transform:uppercase;
+  color:var(--ink-3);padding:0;margin-bottom:10px;font-weight:600;
+}
+.chips{display:flex;flex-wrap:wrap;gap:6px}
+.chip{
+  appearance:none;border:1px solid var(--line);background:var(--panel-2);color:var(--ink-2);
+  font:inherit;font-size:12.5px;padding:6px 11px;border-radius:2px;cursor:pointer;transition:background .12s,color .12s;
+}
+.chip:hover{color:var(--ink);border-color:var(--ink-3)}
+.chip[aria-pressed="true"]{background:var(--focus);border-color:var(--focus);color:var(--on-accent);font-weight:600}
+.chip.none[aria-pressed="true"]{background:var(--ink-3);border-color:var(--ink-3)}
+.hint-inline{margin-top:10px;padding:8px 10px;border-left:2px solid var(--focus);background:var(--panel-2);font-size:11.5px;color:var(--ink-2);line-height:1.5}
+.hero-f{display:flex;align-items:center;gap:12px}
+.hero-f label{font-family:ui-monospace,Menlo,monospace;font-size:11px;letter-spacing:.11em;color:var(--ink-3)}
+.hero-f input{
+  font-family:ui-monospace,Menlo,monospace;font-size:26px;font-weight:600;font-variant-numeric:tabular-nums;
+  padding:5px 11px;width:130px;border:1px solid var(--line);border-radius:2px;background:var(--panel-2);color:var(--ink);
+}
+.hero-f .unit{font-size:11.5px;color:var(--ink-3);line-height:1.35}
+.row{display:flex;flex-wrap:wrap;gap:10px}
+.f{display:flex;flex-direction:column;gap:4px;flex:1 1 90px;min-width:80px}
+.f label{font-size:11.5px;color:var(--ink-2)}
+.f input{font:inherit;font-size:14px;font-variant-numeric:tabular-nums;padding:7px 9px;border:1px solid var(--line);border-radius:2px;background:var(--panel-2);color:var(--ink);width:100%}
+.chk{display:flex;gap:9px;align-items:flex-start;font-size:13.5px;line-height:1.45;cursor:pointer;color:var(--ink)}
+.chk input{margin:3px 0 0;accent-color:var(--focus);flex:none;width:15px;height:15px}
+.chk .hint{display:block;font-size:11.5px;color:var(--ink-3);margin-top:1px}
+.sub{margin-left:24px;padding-left:11px;border-left:2px solid var(--line-2);margin-top:8px;display:flex;flex-direction:column;gap:8px}
+.autos{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px}
+.auto-chip{font-family:ui-monospace,Menlo,monospace;font-size:10.5px;padding:3px 8px;border:1px solid var(--line);border-radius:2px;color:var(--ink-3);background:var(--panel-2)}
+.auto-chip.on{border-color:var(--focus);color:var(--focus);background:transparent;font-weight:600}
+.radio-row{display:flex}
+.radio-row label{flex:1;text-align:center;font-size:13.5px;padding:7px 0;border:1px solid var(--line);cursor:pointer;background:var(--panel-2);color:var(--ink-2)}
+.radio-row label:first-child{border-radius:2px 0 0 2px}
+.radio-row label:last-child{border-radius:0 2px 2px 0;border-left:0}
+.radio-row input{position:absolute;opacity:0;width:0;height:0}
+.radio-row label:has(input:checked){background:var(--panel);border-color:var(--focus);color:var(--ink);font-weight:600}
+.lock{margin:14px 16px 0;padding:9px 12px;border:1px dashed var(--new-edge);background:var(--new-soft);color:var(--new-ink);font-size:12px;border-radius:2px;line-height:1.5}
+.lock b{font-weight:700}
+.lock.ask{border-color:var(--old);background:var(--old-soft);color:var(--old-ink)}
+.reset{margin:0 16px 16px;appearance:none;border:1px solid var(--line);background:var(--panel-2);color:var(--ink-2);font:inherit;font-size:12.5px;padding:8px;border-radius:2px;cursor:pointer}
+.reset:hover{color:var(--ink)}
+
+.vsplit{display:grid;grid-template-columns:1fr 1fr}
+@media (max-width:700px){.vsplit{grid-template-columns:1fr}}
+.v{border-top:3px solid transparent}
+.vsplit > .v + .v{border-left:1px solid var(--line-2)}
+@media (max-width:700px){.vsplit > .v + .v{border-left:0}}
+.v.new{border-top-color:var(--new)}
+.v.old{border-top-color:var(--old)}
+.v-top{padding:11px 15px;border-bottom:1px solid var(--line-2)}
+.v-tag{font-family:ui-monospace,Menlo,monospace;font-size:10.5px;letter-spacing:.13em;text-transform:uppercase;font-weight:700}
+.v.new .v-tag{color:var(--new)} .v.old .v-tag{color:var(--old)}
+.v-body{padding:15px}
+.v-level{font-size:21px;font-weight:650;letter-spacing:-.01em;line-height:1.25}
+.v-basis{font-size:11.5px;color:var(--ink-3);margin-top:4px;line-height:1.45}
+.v-grid{display:grid;grid-template-columns:auto 1fr;gap:7px 14px;margin:14px 0 0;font-size:13px;align-items:baseline}
+.v-grid dt{color:var(--ink-3);font-size:11.5px;font-family:ui-monospace,Menlo,monospace}
+.v-grid dd{margin:0;font-variant-numeric:tabular-nums}
+.big{font-size:19px;font-weight:650;font-variant-numeric:tabular-nums}
+.status{display:inline-flex;gap:6px;margin-top:13px;padding:6px 10px;border-radius:2px;font-size:12.5px;font-weight:600}
+.status.ok{background:var(--ok-soft);color:var(--ok)}
+.status.bad{background:var(--bad-soft);color:var(--bad)}
+.status.na{background:var(--panel-2);color:var(--ink-3);font-weight:400}
+.rl{margin:0;display:flex;flex-direction:column;gap:5px}
+.rl dt{font-family:ui-monospace,Menlo,monospace;font-size:10px;letter-spacing:.11em;text-transform:uppercase;color:var(--ink-3)}
+.rl dd{margin:0 0 10px;font-size:13px;line-height:1.6}
+.rl dd:last-child{margin-bottom:0}
+.rl dd b{font-weight:650}
+.delta{border-top:1px solid var(--line-2);padding:12px 15px;font-size:12.5px;line-height:1.6;color:var(--ink-2)}
+.delta b{font-weight:700;color:var(--ink)}
+.call{border-left:2px solid var(--new);background:var(--panel-2);padding:11px 13px;font-size:13px;line-height:1.6}
+.call p{margin:0}
+
+.tablewrap{overflow-x:auto}
+table{border-collapse:collapse;width:100%;font-size:13px}
+th,td{text-align:left;padding:10px 13px;border-bottom:1px solid var(--line-2);vertical-align:top}
+tbody tr:last-child td{border-bottom:0}
+thead th{font-family:ui-monospace,Menlo,monospace;font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--ink-3);font-weight:600;border-bottom:1px solid var(--line);white-space:nowrap}
+tbody tr{border-left:3px solid transparent}
+tbody tr.r-new{border-left-color:var(--new)}
+tbody tr.r-old{border-left-color:var(--old)}
+td.name{font-weight:600;white-space:nowrap}
+td .ing{display:block;font-size:11px;color:var(--ink-3);font-weight:400;margin-top:2px;white-space:normal}
+.pill{display:inline-block;font-family:ui-monospace,Menlo,monospace;font-size:10px;letter-spacing:.06em;padding:2px 7px;border-radius:2px;white-space:nowrap;font-weight:700}
+.pill.new{background:var(--new-soft);color:var(--new-ink)}
+.pill.old{background:var(--old-soft);color:var(--old-ink)}
+td.note{font-size:12px;color:var(--ink-2);line-height:1.55;min-width:230px}
+.code{font-family:ui-monospace,Menlo,monospace;font-size:11px;color:var(--ink-3);white-space:nowrap}
+td.tgt,th.tgt{font-variant-numeric:tabular-nums;white-space:nowrap}
+
+.sec{margin-top:16px;padding-top:14px;border-top:1px solid var(--line-2)}
+.sec h4{font-family:ui-monospace,Menlo,monospace;font-size:10px;letter-spacing:.11em;text-transform:uppercase;color:var(--ink-3);font-weight:600;margin-bottom:10px}
+.steps{counter-reset:s;display:flex;flex-direction:column;gap:9px;margin:0;padding:0;list-style:none}
+.steps li{display:grid;grid-template-columns:auto 1fr;gap:10px;font-size:12.5px;line-height:1.55}
+.steps li::before{
+  counter-increment:s;content:counter(s);font-family:ui-monospace,Menlo,monospace;font-size:9.5px;font-weight:700;
+  width:18px;height:18px;border-radius:50%;display:grid;place-items:center;background:var(--panel-2);
+  border:1px solid var(--line);color:var(--ink-2);margin-top:1px;
+}
+.sched{display:flex;flex-wrap:wrap;gap:10px 26px;margin:0}
+.sched dt{font-family:ui-monospace,Menlo,monospace;font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-3)}
+.sched dd{margin:4px 0 0;font-size:14px;font-weight:600;font-variant-numeric:tabular-nums}
+.sched dd small{display:block;font-weight:400;font-size:11.5px;color:var(--ink-3);margin-top:2px}
+
+details{border-top:1px solid var(--line-2)}
+details summary{cursor:pointer;padding:11px 16px;font-size:12.5px;color:var(--ink-2);list-style:none;display:flex;justify-content:space-between;gap:12px}
+details summary::-webkit-details-marker{display:none}
+details summary::after{content:"＋";color:var(--ink-3);font-family:ui-monospace,Menlo,monospace}
+details[open] summary::after{content:"−"}
+details .dc{padding:0 16px 16px;font-size:12.5px;line-height:1.65;color:var(--ink-2)}
+details .dc p{margin:0 0 8px}
+details .dc p:last-child{margin-bottom:0}
+details .dc b{color:var(--ink)}
+details.more{border:1px solid var(--line-2);border-radius:2px;margin-top:12px}
+details.more summary{padding:7px 10px;font-size:11.5px}
+details.more .dc{padding:0 10px 10px}
+
+.foot{margin-top:32px;padding-top:16px;border-top:1px solid var(--line);font-size:11.5px;color:var(--ink-3);line-height:1.7;max-width:920px}
+.foot p{margin:0 0 6px}
+.foot b{color:var(--ink-2)}
+@media (prefers-reduced-motion:reduce){*{transition:none !important}}
+</style>
+
+<header class="mast">
+  <div class="mast-in">
+    <div>
+      <div class="eyebrow">健保給付規定 2.6.1 / 2.6.2 / 2.6.3</div>
+      <h1>血脂藥物新舊制判定台</h1>
+      <p>點選情境，同時得出表一與表二的給付門檻與用藥路徑。</p>
+    </div>
+  </div>
+  <div class="tabs" role="tablist">
+    <button type="button" role="tab" aria-selected="true" data-tab="calc">判定台</button>
+    <button type="button" role="tab" aria-selected="false" data-tab="drugs">本院藥品對照</button>
+  </div>
+</header>
+
+<div class="wrap">
+
+<div id="tab-calc">
+<div class="cols">
+
+  <div class="card">
+    <h2>病人條件</h2>
+    <form id="f">
+      <fieldset>
+        <legend>病史與共病</legend>
+        <div class="chips" id="chips"></div>
+        <div class="hint-inline" id="presetHint">可複選。血管疾病一律以影像 ≧50% 直徑狹窄認定。</div>
+      </fieldset>
+
+      <fieldset>
+        <legend>血脂值 mg/dL</legend>
+        <div class="hero-f">
+          <label for="ldl">LDL-C</label>
+          <input id="ldl" type="number" min="0" value="">
+          <span class="unit">mg/dL</span>
+        </div>
+        <details class="more">
+          <summary>TC／HDL-C／TG</summary>
+          <div class="dc">
+            <div class="row">
+              <div class="f"><label for="tc">TC</label><input id="tc" type="number" min="0" value=""></div>
+              <div class="f"><label for="hdl">HDL-C</label><input id="hdl" type="number" min="0" value=""></div>
+              <div class="f"><label for="tg">TG</label><input id="tg" type="number" min="0" value=""></div>
+            </div>
+            <div class="autos"><span class="auto-chip" id="chipNonHdl">non-HDL-C —</span></div>
+          </div>
+        </details>
+      </fieldset>
+
+      <div class="lock hidden" id="lock"></div>
+
+      <fieldset data-tier3>
+        <legend>基本資料</legend>
+        <div class="row">
+          <div class="f" style="flex:1 1 120px">
+            <label>性別</label>
+            <div class="radio-row">
+              <label><input type="radio" name="sex" value="M" checked><span>男</span></label>
+              <label><input type="radio" name="sex" value="F"><span>女</span></label>
+            </div>
+          </div>
+          <div class="f"><label for="age">年齡</label><input id="age" type="number" min="0" max="120" value=""></div>
+        </div>
+        <div class="stack-sm" style="margin-top:10px" id="menoWrap">
+          <label class="chk"><input type="checkbox" id="meno"><span>已停經<span class="hint">僅舊制危險因子採計</span></span></label>
+        </div>
+      </fieldset>
+
+      <fieldset data-tier3>
+        <legend>心血管風險因子</legend>
+        <div class="stack-sm">
+          <label class="chk"><input type="checkbox" id="htn"><span>高血壓</span></label>
+          <label class="chk"><input type="checkbox" id="famhx"><span>早發性冠心病家族史<span class="hint">男 ≦55 歲，女 ≦65 歲</span></span></label>
+          <label class="chk"><input type="checkbox" id="smoke"><span>抽菸</span></label>
+          <label class="chk"><input type="checkbox" id="metsOn"><span>代謝症候群<span class="hint">下列五項符合三項以上；僅新制採計</span></span></label>
+          <div class="sub" id="metsSub">
+            <label class="chk"><input type="checkbox" id="mWaist"><span>腹部肥胖（男 ≧90cm，女 ≧80cm）</span></label>
+            <label class="chk"><input type="checkbox" id="mBp"><span>血壓 ≧130/85 或使用高血壓藥物</span></label>
+            <label class="chk"><input type="checkbox" id="mFpg"><span>空腹血糖 ≧100 或使用糖尿病藥物</span></label>
+            <label class="chk"><input type="checkbox" id="mTgMed"><span>使用治療 TG 之降血脂藥物</span></label>
+            <div class="autos" id="metsAutos"></div>
+          </div>
+        </div>
+        <div class="autos" id="rfAutos"></div>
+      </fieldset>
+    </form>
+
+    <button type="button" class="reset" id="reset">清空重填</button>
+  </div>
+
+  <div class="stack">
+
+    <div class="card">
+      <h2>給付判定</h2>
+      <div class="vsplit">
+        <div class="v new">
+          <div class="v-top"><span class="v-tag">表一 · 新制</span></div>
+          <div class="v-body">
+            <div class="v-level" id="nLevel">—</div>
+            <div class="v-basis" id="nBasis"></div>
+            <dl class="v-grid">
+              <dt>起始門檻</dt><dd id="nStart">—</dd>
+              <dt>LDL-C 目標</dt><dd class="big" id="nTarget">—</dd>
+              <dt>non-HDL-C</dt><dd id="nNonHdl">—</dd>
+            </dl>
+            <div id="nStatus"></div>
+          </div>
+        </div>
+        <div class="v old">
+          <div class="v-top"><span class="v-tag">表二 · 舊制</span></div>
+          <div class="v-body">
+            <div class="v-level" id="oLevel">—</div>
+            <div class="v-basis" id="oBasis"></div>
+            <dl class="v-grid">
+              <dt>起始門檻</dt><dd id="oStart">—</dd>
+              <dt>LDL-C 目標</dt><dd class="big" id="oTarget">—</dd>
+              <dt>TC 目標</dt><dd id="oTc">—</dd>
+            </dl>
+            <div id="oStatus"></div>
+          </div>
+        </div>
+      </div>
+      <div id="deltaBox"></div>
+    </div>
+
+    <div class="card">
+      <h2>處方與追蹤</h2>
+      <div class="vsplit">
+        <div class="v new">
+          <div class="v-top"><span class="v-tag">表一 · 新制</span></div>
+          <div class="v-body">
+            <dl class="rl">
+              <dt>符合給付的院內藥品</dt><dd id="drugNew"></dd>
+              <dt>未達標可加</dt><dd id="escNew"></dd>
+            </dl>
+            <div class="sec"><h4>治療流程</h4><ol class="steps" id="stepsNew"></ol></div>
+            <div class="sec"><h4>追蹤間隔</h4><dl class="sched" id="schedNew"></dl></div>
+          </div>
+        </div>
+        <div class="v old">
+          <div class="v-top"><span class="v-tag">表二 · 舊制</span></div>
+          <div class="v-body">
+            <dl class="rl">
+              <dt>符合給付的院內藥品</dt><dd id="drugOld"></dd>
+              <dt>未達標可加</dt><dd id="escOld"></dd>
+            </dl>
+            <div class="sec"><h4>治療流程</h4><ol class="steps" id="stepsOld"></ol></div>
+            <div class="sec"><h4>追蹤間隔</h4><dl class="sched" id="schedOld"></dl></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <details>
+        <summary>條文依據：表一（115/9/1 生效）</summary>
+        <div class="dc">
+          <p><b>ASCVD 風險等級與目標</b>　極高風險 LDL-C &lt;55（non-HDL-C &lt;85）／非常高風險 &lt;70（&lt;100）／高風險 &lt;100（&lt;130）／中風險 &lt;115（&lt;145）／低風險 &lt;130（&lt;160）／0 項風險因子 &lt;160。起始藥物治療門檻即為各該目標值。</p>
+          <p><b>極高風險</b>　(一) 冠狀動脈疾病合併下列任一：一年內曾經歷心肌梗塞、≧兩次心肌梗塞病史、多支冠狀動脈阻塞、急性冠心症合併糖尿病、周邊動脈疾病或頸動脈狹窄。(二) 周邊動脈疾病合併冠狀動脈疾病或頸動脈狹窄。</p>
+          <p><b>非常高風險</b>　(一) 臨床確診 ASCVD：急性冠心症病史、接受血管再通術、缺血性中風／TIA 合併動脈硬化相關疾病或病史、周邊動脈疾病（曾血管再通術、肢體缺血症狀或截肢）。(二) 影像確認 ≧50% 直徑狹窄率。</p>
+          <p><b>高風險</b>　糖尿病、慢性腎臟病（透析前，UACR ≧30mg/g 或 eGFR &lt;60 持續至少 3 個月）、LDL-C ≧190mg/dL、CAC ≧400。</p>
+          <p><b>中風險</b>　2 項（含）以上心血管風險因子。<b>低風險</b>　1 項心血管風險因子。</p>
+          <p><b>心血管風險因子</b>　高血壓；男 ≧45 歲、女 ≧55 歲；早發性冠心病家族史（男 ≦55、女 ≦65）；HDL-C 男 &lt;40、女 &lt;50；抽菸；代謝症候群（腹部肥胖、血壓偏高、空腹血糖偏高、空腹 TG ≧150、HDL-C 偏低，五項符合三項）。</p>
+          <p><b>判定順序</b>　條文明訂「若未符合上述高風險條件，應以列在低至中風險欄位的心血管風險因子數量作為風險評估」，故高風險以上不再回頭計算風險因子。</p>
+        </div>
+      </details>
+      <details>
+        <summary>條文依據：表二（內容同 108/2/1 版）</summary>
+        <div class="dc">
+          <p><b>ACS 病史；或曾接受心導管介入治療、外科冠動脈搭橋手術之冠狀動脈粥狀硬化患者</b>　起始 LDL-C ≧70，目標 LDL-C &lt;70。</p>
+          <p><b>心血管疾病或糖尿病患者</b>　起始 TC ≧160 或 LDL-C ≧100，目標 TC &lt;160 或 LDL-C &lt;100。</p>
+          <p><b>2 個危險因子或以上</b>　給藥前應有 3-6 個月非藥物治療；起始 TC ≧200 或 LDL-C ≧130。<b>1 個危險因子</b>　TC ≧240 或 LDL-C ≧160。<b>0 個危險因子</b>　LDL-C ≧190。</p>
+          <p><b>心血管疾病定義</b>　冠狀動脈粥狀硬化患者（心絞痛，有心導管證實或缺氧性心電圖變化或負荷性試驗陽性）；缺血型腦血管疾病（腦梗塞、TIA、有症狀之頸動脈狹窄）。</p>
+          <p><b>危險因子</b>　高血壓；男 ≧45 歲、女 ≧55 歲或停經；早發性冠心病家族史；HDL-C &lt;40；吸菸。</p>
+          <p><b>追蹤</b>　第一年應每 3-6 個月抽血檢查一次，第二年以後至少每 6-12 個月一次。</p>
+        </div>
+      </details>
+      <details>
+        <summary>條文依據：2.6.2 Ezetimibe 與 2.6.3 複方</summary>
+        <div class="dc">
+          <p><b>2.6.2（115/9/1 起）</b>　限原發性高膽固醇血症、同型接合子家族性高膽固醇血症、同型接合子性植物固醇血症，並符合下列之一：對 statins 發生無法耐受之藥物不良反應（如 severe myalgia、myositis）；或經 statins 單一治療 <b>6-8 週</b>未達治療目標者，得合併使用。惟 Ezetity、Ezzicad、Ezta 10、Ezetimibe Sandoz 等 4 品項須滿 <b>3 個月</b>。</p>
+          <p><b>2.6.3（115/9/1 起）</b>　限原發性高膽固醇血症、HoFH 病患；經 statin 單一治療 <b>6-8 週</b>未達治療目標者得使用。惟 Agitin、Sacure、Ezta-SM、Zoliton、Zovastin、Cretrol、Livazebe 等 10 品項須滿 <b>3 個月</b>。本品不得與 gemfibrozil 併用。</p>
+          <p>新制同時刪去了舊條文中「並符合全民健康保險降血脂藥物給付規定表」之綁定文字。115/8/31 前，ezetimibe 與複方一律須 statin 單方滿 3 個月。</p>
+        </div>
+      </details>
+    </div>
+
+  </div>
+</div>
+</div>
+
+<div id="tab-drugs" class="hidden">
+  <div class="solo">
+    <div class="card">
+      <h2>本院藥品的制度歸屬</h2>
+      <div class="tablewrap">
+        <table>
+          <thead><tr><th>品項</th><th>健保代碼</th><th>給付規定表</th><th>備註</th></tr></thead>
+          <tbody id="fbody"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2>風險等級與 LDL-C 目標</h2>
+      <div class="tablewrap">
+        <table>
+          <thead><tr><th>表一 · 新制</th><th class="tgt">目標</th><th>表二 · 舊制</th><th class="tgt">目標</th></tr></thead>
+          <tbody>
+            <tr class="r-new"><td>極高風險</td><td class="tgt">&lt; 55</td><td>ACS 病史／曾 PCI・CABG</td><td class="tgt">&lt; 70</td></tr>
+            <tr class="r-new"><td>非常高風險</td><td class="tgt">&lt; 70</td><td>心血管疾病或糖尿病</td><td class="tgt">&lt; 100</td></tr>
+            <tr class="r-new"><td>高風險</td><td class="tgt">&lt; 100</td><td>2 個危險因子以上</td><td class="tgt">&lt; 130</td></tr>
+            <tr class="r-new"><td>中風險</td><td class="tgt">&lt; 115</td><td>1 個危險因子</td><td class="tgt">&lt; 160</td></tr>
+            <tr class="r-new"><td>低風險</td><td class="tgt">&lt; 130</td><td>0 個危險因子</td><td class="tgt">&lt; 190</td></tr>
+            <tr class="r-new"><td>0 項風險因子</td><td class="tgt">&lt; 160</td><td>—</td><td class="tgt">—</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="card-body" style="border-top:1px solid var(--line-2)">
+        <div class="call"><p>115/9/1 起兩表並行，<b>依健保代碼認定</b>：多數降膽固醇藥品適用表一，健保署公告所列（降膽固醇藥 116 項、ezetimibe 4 項、複方 10 項）沿用表二。</p></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="foot">
+  <p><b>資料來源</b>　藥物給付項目及支付標準共同擬訂會議藥品部分第 82 次會議，附件1、附件2（第 2 節 心臟血管及腎臟藥物，115/9/1 生效）。</p>
+  <p><b>未涵蓋</b>　PCSK9 單抗、siRNA、ATP citrate lyase 抑制劑依各該條文與事前審查辦理；降三酸甘油酯藥物本次未修訂，未納入判定。</p>
+  <p><b>本頁為給付規範查詢輔助工具，非臨床治療指引；實際給付以中央健康保險署公告為準。</b></p>
+</div>
+
+</div>
+
+<script>
+const FORM=[
+ {n:"Lipitor 40mg",            code:"BC22889100", ing:"atorvastatin 40mg", reg:"new", kind:"statin",
+  note:"院內唯一的表一高強度 statin，追 LDL-C &lt;55 的主力。"},
+ {n:"Rosuvastatin Mylan 10mg", code:"BC26497100", ing:"rosuvastatin 10mg", reg:"new", kind:"statin",
+  note:"為升強度而改開 Crestor 20mg 會掉回表二目標。"},
+ {n:"Zulitor 4mg",             code:"AC58639100", ing:"pitavastatin 4mg", reg:"new", kind:"statin",
+  note:"同成分的 Livalo 2mg 屬表二。"},
+ {n:"Ezetrol 10mg",            code:"BC24058100", ing:"ezetimibe 10mg", reg:"new", kind:"eze", wait:"6-8 週",
+  note:"115/9/1 起 statin 單方 <b>6-8 週</b>未達標即可加（此前須 3 個月）；statin 不耐受者不受等待期限制。"},
+ {n:"Vytorin 10/20mg",         code:"BC24250100", ing:"ezetimibe 10 + simvastatin 20", reg:"new", kind:"combo", wait:"6-8 週",
+  note:"115/9/1 起 <b>6-8 週</b>即可換用，比 Cretrol 早 4-6 週。不得與 gemfibrozil 併用。"},
+ {n:"Crestor 20mg",            code:"BC24129100", ing:"rosuvastatin 20mg", reg:"old", kind:"statin",
+  note:"高強度但屬表二，目標降不到 &lt;55；改用 Lipitor 40mg。"},
+ {n:"Livalo 2mg",              code:"BC25350100", ing:"pitavastatin 2mg", reg:"old", kind:"statin",
+  note:"同成分的 Zulitor 4mg 屬表一。"},
+ {n:"Cretrol 10/10mg",         code:"BC28181100", ing:"ezetimibe 10 + rosuvastatin 10", reg:"old", kind:"combo", wait:"3 個月",
+  note:"2.6.3 條文所列，兩表<b>都須</b> statin 單方滿 3 個月。不得與 gemfibrozil 併用。"}
+];
+
+const NEW={
+ VVH:{name:"極高風險",ldl:55,nhdl:85,tier:"top"},
+ VH :{name:"非常高風險",ldl:70,nhdl:100,tier:"top"},
+ H  :{name:"高風險",ldl:100,nhdl:130,tier:"high"},
+ M  :{name:"中風險",ldl:115,nhdl:145,tier:"low"},
+ L  :{name:"低風險",ldl:130,nhdl:160,tier:"low"},
+ Z  :{name:"0 項心血管風險因子",ldl:160,nhdl:null,tier:"low"}
+};
+const OLD={
+ A:{name:"ACS 病史／曾 PCI・CABG",ldl:70,tc:null,start:"LDL-C ≧70"},
+ B:{name:"心血管疾病或糖尿病",ldl:100,tc:160,start:"TC ≧160 或 LDL-C ≧100"},
+ C:{name:"2 個危險因子或以上",ldl:130,tc:200,start:"TC ≧200 或 LDL-C ≧130"},
+ D:{name:"1 個危險因子",ldl:160,tc:240,start:"TC ≧240 或 LDL-C ≧160"},
+ E:{name:"0 個危險因子",ldl:190,tc:null,start:"LDL-C ≧190"}
+};
+
+// 每個 chip 對應一個條文條件；血管床診斷即隱含影像 ≧50% 狹窄
+const CHIPS=[
+ {id:"cad",     label:"冠狀動脈疾病"},
+ {id:"acs",     label:"急性冠心症病史"},
+ {id:"revasc",  label:"曾 PCI／CABG"},
+ {id:"mi1y",    label:"一年內心肌梗塞"},
+ {id:"mi2",     label:"≧2 次心肌梗塞"},
+ {id:"multi",   label:"多支冠狀動脈阻塞"},
+ {id:"carotid", label:"頸動脈狹窄"},
+ {id:"pad",     label:"周邊動脈疾病"},
+ {id:"stroke",  label:"缺血性中風／TIA"},
+ {id:"dm",      label:"糖尿病"},
+ {id:"ckd",     label:"慢性腎臟病"},
+ {id:"cac400",  label:"CAC ≧400"}
+];
+let cond={};
+
+const $=id=>document.getElementById(id);
+const on=id=>$(id).checked;
+const num=id=>{const v=parseFloat($(id).value);return isFinite(v)?v:null;};
+
+function readState(){
+  const sex=document.querySelector('input[name=sex]:checked').value;
+  const c=id=>!!cond[id];
+  // 冠心病史的任一形式都代表冠狀動脈疾病
+  const cad=c("cad")||c("acs")||c("revasc")||c("mi1y")||c("mi2")||c("multi");
+  return {sex,age:num("age"),ldl:num("ldl"),tc:num("tc"),hdl:num("hdl"),tg:num("tg"),
+    cad, pad:c("pad"), carotid:c("carotid"), stroke:c("stroke"),
+    acs:c("acs"), revasc:c("revasc"), mi1y:c("mi1y"), mi2:c("mi2"), multi:c("multi"),
+    dm:c("dm"), ckd:c("ckd"), cac400:c("cac400"),
+    // 血管床一經診斷即視為影像確認 ≧50% 狹窄
+    img50: cad||c("pad")||c("carotid"),
+    strokeAthero: c("stroke"),
+    padEv: c("pad"),
+    htn:on("htn"),famhx:on("famhx"),smoke:on("smoke"),meno:on("meno"),
+    metsOn:on("metsOn"),mWaist:on("mWaist"),mBp:on("mBp"),mFpg:on("mFpg"),mTgMed:on("mTgMed")};
+}
+
+function metsCount(s){
+  let c=0,items=[];
+  if(s.mWaist){c++;items.push("腹部肥胖");}
+  if(s.mBp){c++;items.push("血壓偏高");}
+  if(s.mFpg){c++;items.push("空腹血糖偏高");}
+  if((s.tg!==null&&s.tg>=150)||s.mTgMed){c++;items.push("TG ≧150");}
+  if(s.hdl!==null&&(s.sex==="M"?s.hdl<40:s.hdl<50)){c++;items.push("HDL-C 偏低");}
+  return {c,items,met:c>=3};
+}
+function newFactors(s){
+  const f=[];
+  if(s.htn)f.push("高血壓");
+  if(s.age!==null&&(s.sex==="M"?s.age>=45:s.age>=55))f.push(s.sex==="M"?"男 ≧45 歲":"女 ≧55 歲");
+  if(s.famhx)f.push("早發性冠心病家族史");
+  if(s.hdl!==null&&(s.sex==="M"?s.hdl<40:s.hdl<50))f.push("HDL-C 偏低");
+  if(s.smoke)f.push("抽菸");
+  if(s.metsOn&&metsCount(s).met)f.push("代謝症候群");
+  return f;
+}
+function oldFactors(s){
+  const f=[];
+  if(s.htn)f.push("高血壓");
+  if((s.age!==null&&(s.sex==="M"?s.age>=45:s.age>=55))||(s.sex==="F"&&s.meno))f.push(s.sex==="M"?"男 ≧45 歲":"女 ≧55 歲或停經");
+  if(s.famhx)f.push("早發性冠心病家族史");
+  if(s.hdl!==null&&s.hdl<40)f.push("HDL-C <40");
+  if(s.smoke)f.push("吸菸");
+  return f;
+}
+function missingRiskData(s){
+  const missing=[];
+  if(s.age===null)missing.push("年齡");
+  if(s.hdl===null)missing.push("HDL-C");
+  if(s.metsOn&&!metsCount(s).met)missing.push("代謝症候群五項資料");
+  return missing;
+}
+function newLevel(s){
+  if(s.cad&&(s.mi1y||s.mi2||s.multi||(s.acs&&s.dm)||s.pad||s.carotid)){
+    const w=[];if(s.mi1y)w.push("一年內心肌梗塞");if(s.mi2)w.push("≧2 次心肌梗塞");if(s.multi)w.push("多支冠狀動脈阻塞");
+    if(s.acs&&s.dm)w.push("急性冠心症合併糖尿病");if(s.pad)w.push("周邊動脈疾病");if(s.carotid)w.push("頸動脈狹窄");
+    return {k:"VVH",why:"冠狀動脈疾病合併 "+w.join("、")};
+  }
+  if(s.pad&&(s.cad||s.carotid))
+    return {k:"VVH",why:"周邊動脈疾病合併 "+(s.cad?"冠狀動脈疾病":"")+(s.cad&&s.carotid?"、":"")+(s.carotid?"頸動脈狹窄":"")};
+  const vh=[];
+  if(s.acs)vh.push("急性冠心症病史");
+  if(s.revasc)vh.push("曾接受血管再通術");
+  if(s.strokeAthero)vh.push("缺血性中風／TIA 合併動脈硬化疾病");
+  if(s.padEv)vh.push("周邊動脈疾病（曾再通術／肢體缺血／截肢）");
+  if(s.img50)vh.push("影像 ≧50% 狹窄");
+  if(vh.length)return {k:"VH",why:vh.join("、")};
+  const h=[];
+  if(s.dm)h.push("糖尿病");
+  if(s.ckd)h.push("慢性腎臟病");
+  if(s.ldl!==null&&s.ldl>=190)h.push("LDL-C ≧190");
+  if(s.cac400)h.push("CAC ≧400");
+  if(h.length)return {k:"H",why:h.join("、")};
+  const f=newFactors(s);
+  if(f.length>=2)return {k:"M",why:f.length+" 項風險因子："+f.join("、")};
+  if(f.length===1)return {k:"L",why:"1 項風險因子："+f[0]};
+  return {k:"Z",why:"未計得心血管風險因子"};
+}
+function oldLevel(s){
+  if(s.acs||s.revasc)return {k:"A",why:(s.acs?"急性冠狀動脈症候群病史":"")+(s.acs&&s.revasc?"；":"")+(s.revasc?"曾接受心導管介入治療或冠動脈搭橋手術":"")};
+  const cvd=[];
+  if(s.cad)cvd.push("冠狀動脈粥狀硬化");
+  if(s.stroke)cvd.push("缺血型腦血管疾病");
+  if(s.carotid)cvd.push("有症狀之頸動脈狹窄");
+  if(cvd.length||s.dm)return {k:"B",why:(cvd.length?cvd.join("、"):"")+(cvd.length&&s.dm?"；":"")+(s.dm?"糖尿病":"")};
+  const f=oldFactors(s);
+  if(f.length>=2)return {k:"C",why:f.length+" 個危險因子："+f.join("、")};
+  if(f.length===1)return {k:"D",why:"1 個危險因子："+f[0]};
+  return {k:"E",why:"未計得危險因子"};
+}
+function statusEl(cur,target){
+  if(cur===null)return '<div class="status na">未輸入 LDL-C</div>';
+  const d=cur-target;
+  if(d<0)return '<div class="status ok">已達標　'+cur+' &lt; '+target+'</div>';
+  return '<div class="status bad">未達標　差 '+d.toFixed(0)+' mg/dL</div>';
+}
+function oldStatusEl(s,O){
+  const ldlOk=s.ldl!==null&&s.ldl<O.ldl;
+  const tcOk=O.tc!==null&&s.tc!==null&&s.tc<O.tc;
+  if(ldlOk||tcOk){
+    const achieved=[];
+    if(ldlOk)achieved.push('LDL-C '+s.ldl+' < '+O.ldl);
+    if(tcOk)achieved.push('TC '+s.tc+' < '+O.tc);
+    return '<div class="status ok">已達標　'+achieved.join(' 或 ')+'</div>';
+  }
+  if(O.tc!==null&&(s.ldl===null||s.tc===null))
+    return '<div class="status na">資料不足，無法以 TC 或 LDL-C 判定</div>';
+  if(s.ldl===null)return '<div class="status na">未輸入 LDL-C</div>';
+  if(O.tc===null){
+    return '<div class="status bad">未達標　差 '+(s.ldl-O.ldl).toFixed(0)+' mg/dL</div>';
+  }
+  return '<div class="status bad">未達標　LDL-C 差 '+(s.ldl-O.ldl).toFixed(0)+'、TC 差 '+(s.tc-O.tc).toFixed(0)+' mg/dL</div>';
+}
+const fmtDate=d=>(d.getMonth()+1)+"/"+d.getDate();
+const plusWeeks=w=>{const d=new Date();d.setDate(d.getDate()+w*7);return d;};
+const plusMonths=m=>{const d=new Date();d.setMonth(d.getMonth()+m);return d;};
+
+function render(){
+  const s=readState();
+  const nonHdl=(s.tc!==null&&s.hdl!==null)?s.tc-s.hdl:null;
+  $("chipNonHdl").textContent="non-HDL-C "+(nonHdl!==null?nonHdl+" mg/dL":"—");
+  $("chipNonHdl").className="auto-chip"+(nonHdl!==null?" on":"");
+  $("menoWrap").classList.toggle("hidden",s.sex!=="F");
+  $("metsSub").classList.toggle("hidden",!s.metsOn);
+  const any=CHIPS.some(c=>cond[c.id]);
+  document.querySelectorAll("#chips .chip").forEach(c=>
+    c.setAttribute("aria-pressed",String(c.dataset.id==="__none"?!any:!!cond[c.dataset.id])));
+
+  const mc=metsCount(s);
+  $("metsAutos").innerHTML='<span class="auto-chip'+(mc.met?" on":"")+'">符合 '+mc.c+' / 5 項'+(mc.met?"　→ 成立":"")+'</span>'+
+    (mc.items.length?'<span class="auto-chip">'+mc.items.join("・")+'</span>':"");
+  const nf=newFactors(s), of=oldFactors(s);
+  $("rfAutos").innerHTML='<span class="auto-chip'+(nf.length?" on":"")+'">新制計得 '+nf.length+' 項</span>'+
+                         '<span class="auto-chip'+(of.length?" on":"")+'">舊制計得 '+of.length+' 項</span>';
+
+  const nl=newLevel(s), N=NEW[nl.k];
+  const ol=oldLevel(s), O=OLD[ol.k];
+
+  // 表一短路於高風險以上；表二只在 ACS／心血管疾病或糖尿病時短路，其餘仍須數危險因子
+  const newLocked=(nl.k==="VVH"||nl.k==="VH"||nl.k==="H");
+  const oldLocked=(ol.k==="A"||ol.k==="B");
+  const locked=newLocked&&oldLocked;
+  const needRiskData=!locked;
+  const missing=needRiskData?missingRiskData(s):[];
+  document.querySelectorAll("[data-tier3]").forEach(el=>el.classList.toggle("hidden",!needRiskData));
+
+  const notInOld=[];
+  if(s.cac400)notInOld.push("CAC ≧400");
+  if(s.ckd)notInOld.push("慢性腎臟病");
+  if(s.pad)notInOld.push("周邊動脈疾病");
+  const lock=$("lock");
+  lock.classList.toggle("hidden",!(locked||newLocked||missing.length));
+  lock.classList.toggle("ask",!locked);
+  if(locked){
+    lock.innerHTML="已達 <b>"+N.name+"</b>，兩表都不再計算風險因子，相關欄位已收合。";
+  }else if(newLocked){
+    lock.innerHTML="表一已達 <b>"+N.name+"</b>，但"+
+      (notInOld.length?"<b>"+notInOld.join("、")+"</b>不在表二的判定條件內":"表二尚未歸入心血管疾病")+
+      "，<b>表二仍須計算危險因子</b>——請填下方欄位。"+
+      (missing.length?"尚需填寫：<b>"+missing.join("、")+"</b>；未填資料不視為沒有風險。":"");
+  }else if(missing.length){
+    lock.innerHTML="目前仍需依心血管風險因子判定；以下欄位已展開，尚需填寫：<b>"+
+      missing.join("、")+"</b>。未填資料不視為沒有風險。";
+  }
+
+
+  $("nLevel").textContent=N.name;
+  $("nBasis").textContent=nl.why;
+  $("nStart").textContent="LDL-C ≧"+N.ldl+" mg/dL";
+  $("nTarget").innerHTML='&lt; '+N.ldl+' <span style="font-size:12px;font-weight:400;color:var(--ink-3)">mg/dL</span>';
+  $("nNonHdl").innerHTML=N.nhdl?('&lt; '+N.nhdl+(nonHdl!==null?' <span style="color:var(--ink-3);font-size:12px">（現值 '+nonHdl+'）</span>':'')):'—';
+  $("nStatus").innerHTML=statusEl(s.ldl,N.ldl);
+
+  $("oLevel").textContent=O.name;
+  $("oBasis").textContent=ol.why;
+  $("oStart").textContent=O.start;
+  $("oTarget").innerHTML='&lt; '+O.ldl+' <span style="font-size:12px;font-weight:400;color:var(--ink-3)">mg/dL</span>';
+  $("oTc").innerHTML=O.tc?('&lt; '+O.tc+(s.tc!==null?' <span style="color:var(--ink-3);font-size:12px">（現值 '+s.tc+'）</span>':'')):'—';
+  $("oStatus").innerHTML=oldStatusEl(s,O);
+
+  const gap=O.ldl-N.ldl;
+  $("deltaBox").innerHTML='<div class="delta">'+(gap>0
+    ? '兩表目標相差 <b>'+gap+' mg/dL</b>：表一品項可追到 <b>&lt;'+N.ldl+'</b>，表二品項仍為 <b>&lt;'+O.ldl+'</b>。'
+    : '兩表目標相同（<b>&lt;'+N.ldl+'</b>），選藥不影響目標值，但 ezetimibe 等待期仍有差異。')+'</div>';
+
+  const newSteps = (N.tier!=="low")
+    ? ["<b>起始</b>　中至高強度 statin ± ezetimibe",
+       "<b>6-8 週複檢</b>　達標則維持",
+       "<b>未達標</b>　升至高強度或最大耐受劑量，或加 non-statin"]
+    : ["<b>先改變生活型態</b>　並處置心血管風險因子",
+       "<b>3-6 個月未達標</b>　給中強度 statin",
+       "<b>6-8 週複檢</b>　仍未達標則升階或加 non-statin"];
+  const newSched = (N.tier!=="low")
+    ? [["起始後複檢","6-8 週",fmtDate(plusWeeks(6))+" – "+fmtDate(plusWeeks(8))],
+       ["更動後複檢","1-3 個月",fmtDate(plusMonths(1))+" – "+fmtDate(plusMonths(3))],
+       ["達標後","每 6 個月",fmtDate(plusMonths(6))]]
+    : [["生活型態改變","3-6 個月",fmtDate(plusMonths(3))+" – "+fmtDate(plusMonths(6))],
+       ["起始 statin 後","6-8 週",fmtDate(plusWeeks(6))+" – "+fmtDate(plusWeeks(8))],
+       ["達標後","每 6-12 個月",fmtDate(plusMonths(6))]];
+
+  const parallel = (ol.k==="A"||ol.k==="B");
+  const oldSteps = [
+    parallel ? "<b>非藥物治療可與藥物並行</b>　達門檻即可起始"
+             : "<b>給藥前須 3-6 個月非藥物治療</b>　否則不予給付",
+    "<b>達 "+O.start+"</b>　起始用藥，目標 LDL-C &lt;"+O.ldl+"",
+    "<b>Ezetimibe／複方</b>　須 statin 單方滿 3 個月未達標，或 statin 不耐受"];
+  const oldSched = [
+    parallel ? ["非藥物治療","可與藥物並行","即刻起始"]
+             : ["給藥前","3-6 個月",fmtDate(plusMonths(3))+" – "+fmtDate(plusMonths(6))],
+    ["第一年","每 3-6 個月",fmtDate(plusMonths(3))+" – "+fmtDate(plusMonths(6))],
+    ["第二年起","每 6-12 個月",fmtDate(plusMonths(6))]];
+
+  const renderSteps=(el,a)=>$(el).innerHTML=a.map(x=>"<li><span>"+x+"</span></li>").join("");
+  const renderSched=(el,a)=>$(el).innerHTML=a.map(x=>'<div><dt>'+x[0]+'</dt><dd>'+x[1]+'<small>'+x[2]+'</small></dd></div>').join("");
+  renderSteps("stepsNew",newSteps); renderSteps("stepsOld",oldSteps);
+  renderSched("schedNew",newSched); renderSched("schedOld",oldSched);
+}
+
+(function(){
+  $("fbody").innerHTML=FORM.map(d=>
+    '<tr class="'+(d.reg==="new"?"r-new":"r-old")+'">'+
+    '<td class="name">'+d.n+'<span class="ing">'+d.ing+'</span></td>'+
+    '<td class="code">'+d.code+'</td>'+
+    '<td><span class="pill '+d.reg+'">'+(d.reg==="new"?"表一 新制":"表二 舊制")+'</span></td>'+
+    '<td class="note">'+d.note+'</td></tr>').join("");
+
+  const nameList=a=>a.map(d=>'<b>'+d.n+'</b>').join('　·　');
+  const fillRoute=(reg,drugEl,escEl)=>{
+    const all=FORM.filter(d=>d.reg===reg);
+    const add=all.filter(d=>d.kind!=="statin");
+    let esc=add.length
+      ? 'statin 單方 <b>'+add[0].wait+'</b>未達標 → 加 '+nameList(add.filter(d=>d.kind==="eze"))+
+        (add.some(d=>d.kind==="eze")&&add.some(d=>d.kind==="combo")?'，或改 ':'') +
+        nameList(add.filter(d=>d.kind==="combo"))
+      : '院內無此表的 ezetimibe 品項。';
+    if(reg==="new")esc+='。再不足：PCSK9 單抗／siRNA／ATP citrate lyase 抑制劑（需事前審查）。';
+    else esc+='。不得與 gemfibrozil 併用。';
+    $(drugEl).innerHTML=nameList(all);
+    $(escEl).innerHTML=esc;
+  };
+  fillRoute("new","drugNew","escNew");
+  fillRoute("old","drugOld","escOld");
+
+  $("chips").innerHTML=CHIPS.map(c=>'<button type="button" class="chip" data-id="'+c.id+'" aria-pressed="false">'+c.label+'</button>').join("")
+    +'<button type="button" class="chip none" data-id="__none" aria-pressed="true">以上皆無</button>';
+  document.querySelectorAll("#chips .chip").forEach(c=>c.addEventListener("click",()=>{
+    if(c.dataset.id==="__none")cond={}; else cond[c.dataset.id]=!cond[c.dataset.id];
+    render();
+  }));
+
+  document.querySelectorAll(".tabs button").forEach(b=>b.addEventListener("click",()=>{
+    document.querySelectorAll(".tabs button").forEach(x=>x.setAttribute("aria-selected",String(x===b)));
+    $("tab-calc").classList.toggle("hidden",b.dataset.tab!=="calc");
+    $("tab-drugs").classList.toggle("hidden",b.dataset.tab!=="drugs");
+  }));
+
+  $("f").addEventListener("input",render);
+  $("f").addEventListener("change",render);
+  $("reset").addEventListener("click",()=>{
+    cond={};
+    document.querySelectorAll("#f input[type=checkbox]").forEach(c=>c.checked=false);
+    ["age","ldl","tc","hdl","tg"].forEach(id=>$(id).value="");
+    render();
+  });
+  render();
+})();
+</script>
