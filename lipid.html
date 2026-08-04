@@ -99,7 +99,6 @@ legend{
 .chip-sub{margin-left:15px;padding:10px 0 2px 12px;border-left:2px solid var(--line-2)}
 .chip-sub-title{font-size:11.5px;color:var(--ink-3);margin-bottom:7px}
 .chip-sub .hint-inline{margin-top:9px}
-.chip-note{flex:1 1 100%;margin-top:0}
 .chip{
   appearance:none;border:1px solid var(--line);background:var(--panel-2);color:var(--ink-2);
   font:inherit;font-size:12.5px;padding:6px 11px;border-radius:2px;cursor:pointer;transition:background .12s,color .12s;
@@ -645,7 +644,6 @@ function render(){
   $("cadDetails").classList.toggle("hidden",!cond.cad);
   const cadChip=$("chips").querySelector('[data-id="cad"]');
   cadChip.setAttribute("aria-expanded",String(!!cond.cad));
-  $("ckdDefinition").classList.toggle("hidden",!cond.ckd);
 
   const mc=metsCount(s);
   $("metsAutos").innerHTML='<span class="auto-chip'+(mc.met?" on":"")+'">符合 '+mc.c+' / 5 項'+(mc.met?"　→ 成立":"")+'</span>'+ 
@@ -776,7 +774,6 @@ function render(){
     '</div>'+
   '</div>'+
   '<div class="chips">'+OTHER_CHIPS.map(chipHtml).join("")+'</div>'+
-  '<div class="hint-inline chip-note hidden" id="ckdDefinition"><b>慢性腎臟病定義：</b>透析前，UACR ≧30 mg/g 或 eGFR &lt;60 mL/min/1.73m²，持續至少 3 個月。</div>'+
   '<button type="button" class="chip none" data-id="__none" aria-pressed="true">以上皆無</button>';
   document.querySelectorAll("#chips .chip").forEach(c=>c.addEventListener("click",()=>{
     if(c.dataset.id==="__none")cond={};
