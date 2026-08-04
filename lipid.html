@@ -676,7 +676,7 @@ function render(){
   lock.classList.toggle("hidden",!(locked||newLocked||missing.length));
   lock.classList.toggle("ask",!locked);
   if(locked){
-    lock.innerHTML="已達 <b>"+N.name+"</b>，兩表都不再計算風險因子，相關欄位已收合。";
+    lock.innerHTML="已達 <b>"+N.name+"</b>。";
   }else if(newLocked){
     lock.innerHTML="表一已達 <b>"+N.name+"</b>，但"+
       (notInOld.length?"<b>"+notInOld.join("、")+"</b>不在表二的判定條件內":"表二尚未歸入心血管疾病")+
