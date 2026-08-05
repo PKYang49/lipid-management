@@ -1,8 +1,4 @@
-<!doctype html>
-<html lang="zh-Hant">
-<head>
-<meta charset="utf-8">
-<title>血脂給付規範評估工具</title>
+<title>血脂給付判定台</title>
 <style>
 :root{
   --ground:#EDF1F3; --panel:#FFFFFF; --panel-2:#F6F9FA;
@@ -95,10 +91,6 @@ legend{
   color:var(--ink-3);padding:0;margin-bottom:10px;font-weight:600;
 }
 .chips{display:flex;flex-wrap:wrap;gap:6px}
-.chip-group{flex:1 1 100%;display:flex;flex-direction:column;gap:8px}
-.chip-sub{margin-left:15px;padding:10px 0 2px 12px;border-left:2px solid var(--line-2)}
-.chip-sub-title{font-size:11.5px;color:var(--ink-3);margin-bottom:7px}
-.chip-sub .hint-inline{margin-top:9px}
 .chip{
   appearance:none;border:1px solid var(--line);background:var(--panel-2);color:var(--ink-2);
   font:inherit;font-size:12.5px;padding:6px 11px;border-radius:2px;cursor:pointer;transition:background .12s,color .12s;
@@ -106,6 +98,8 @@ legend{
 .chip:hover{color:var(--ink);border-color:var(--ink-3)}
 .chip[aria-pressed="true"]{background:var(--focus);border-color:var(--focus);color:var(--on-accent);font-weight:600}
 .chip.none[aria-pressed="true"]{background:var(--ink-3);border-color:var(--ink-3)}
+.sub-chips{margin:8px 0 0 11px;padding-left:11px;border-left:2px solid var(--line-2)}
+.sub-chips .chip{font-size:12px;padding:5px 10px}
 .hint-inline{margin-top:10px;padding:8px 10px;border-left:2px solid var(--focus);background:var(--panel-2);font-size:11.5px;color:var(--ink-2);line-height:1.5}
 .hero-f{display:flex;align-items:center;gap:12px}
 .hero-f label{font-family:ui-monospace,Menlo,monospace;font-size:11px;letter-spacing:.11em;color:var(--ink-3)}
@@ -155,8 +149,6 @@ legend{
 .v-grid dd{margin:0;font-variant-numeric:tabular-nums}
 .big{font-size:19px;font-weight:650;font-variant-numeric:tabular-nums}
 .status{display:inline-flex;gap:6px;margin-top:13px;padding:6px 10px;border-radius:2px;font-size:12.5px;font-weight:600}
-.status-stack{display:flex;flex-direction:column;align-items:flex-start;gap:6px;margin-top:13px}
-.status-stack .status{margin-top:0}
 .status.ok{background:var(--ok-soft);color:var(--ok)}
 .status.bad{background:var(--bad-soft);color:var(--bad)}
 .status.na{background:var(--panel-2);color:var(--ink-3);font-weight:400}
@@ -219,19 +211,17 @@ details.more .dc{padding:0 10px 10px}
 .foot b{color:var(--ink-2)}
 @media (prefers-reduced-motion:reduce){*{transition:none !important}}
 </style>
-</head>
-<body>
 
 <header class="mast">
   <div class="mast-in">
     <div>
       <div class="eyebrow">健保給付規定 2.6.1 / 2.6.2 / 2.6.3</div>
-      <h1>血脂給付規範評估工具</h1>
-      <p>點選情境，同時得出新制與舊制的給付門檻與用藥路徑。</p>
+      <h1>血脂藥物新舊制判定台</h1>
+      <p>點選情境，同時得出表一與表二的給付門檻與用藥路徑。</p>
     </div>
   </div>
   <div class="tabs" role="tablist">
-    <button type="button" role="tab" aria-selected="true" data-tab="calc">給付評估</button>
+    <button type="button" role="tab" aria-selected="true" data-tab="calc">判定台</button>
     <button type="button" role="tab" aria-selected="false" data-tab="drugs">本院藥品對照</button>
   </div>
 </header>
@@ -247,23 +237,24 @@ details.more .dc{padding:0 10px 10px}
       <fieldset>
         <legend>病史與共病</legend>
         <div class="chips" id="chips"></div>
-        <div class="hint-inline" id="presetHint">可複選；選擇 CAD 後可展開冠心病細項。血管疾病一律以影像 ≧50% 直徑狹窄認定。</div>
+        <div class="chips sub-chips hidden" id="cadSub"></div>
+        <div class="hint-inline" id="presetHint">可複選。周邊動脈疾病與頸動脈狹窄以影像 ≧50% 直徑狹窄認定。</div>
       </fieldset>
 
       <fieldset>
         <legend>血脂值 mg/dL</legend>
         <div class="hero-f">
           <label for="ldl">LDL-C</label>
-          <input id="ldl" type="number" min="0" value="">
+          <input id="ldl" type="number" min="0" value="112">
           <span class="unit">mg/dL</span>
         </div>
-        <details class="more" id="nonLdlFields">
+        <details class="more">
           <summary>TC／HDL-C／TG</summary>
           <div class="dc">
             <div class="row">
-              <div class="f"><label for="tc">TC</label><input id="tc" type="number" min="0" value=""></div>
-              <div class="f"><label for="hdl">HDL-C</label><input id="hdl" type="number" min="0" value=""></div>
-              <div class="f"><label for="tg">TG</label><input id="tg" type="number" min="0" value=""></div>
+              <div class="f"><label for="tc">TC</label><input id="tc" type="number" min="0" value="196"></div>
+              <div class="f"><label for="hdl">HDL-C</label><input id="hdl" type="number" min="0" value="38"></div>
+              <div class="f"><label for="tg">TG</label><input id="tg" type="number" min="0" value="180"></div>
             </div>
             <div class="autos"><span class="auto-chip" id="chipNonHdl">non-HDL-C —</span></div>
           </div>
@@ -282,7 +273,7 @@ details.more .dc{padding:0 10px 10px}
               <label><input type="radio" name="sex" value="F"><span>女</span></label>
             </div>
           </div>
-          <div class="f"><label for="age">年齡</label><input id="age" type="number" min="0" max="120" value=""></div>
+          <div class="f"><label for="age">年齡</label><input id="age" type="number" min="0" max="120" value="62"></div>
         </div>
         <div class="stack-sm" style="margin-top:10px" id="menoWrap">
           <label class="chk"><input type="checkbox" id="meno"><span>已停經<span class="hint">僅舊制危險因子採計</span></span></label>
@@ -295,15 +286,13 @@ details.more .dc{padding:0 10px 10px}
           <label class="chk"><input type="checkbox" id="htn"><span>高血壓</span></label>
           <label class="chk"><input type="checkbox" id="famhx"><span>早發性冠心病家族史<span class="hint">男 ≦55 歲，女 ≦65 歲</span></span></label>
           <label class="chk"><input type="checkbox" id="smoke"><span>抽菸</span></label>
-          <div id="newRiskFields">
-            <label class="chk"><input type="checkbox" id="metsOn"><span>代謝症候群<span class="hint">下列五項符合三項以上；僅新制採計</span></span></label>
-            <div class="sub" id="metsSub">
-              <label class="chk"><input type="checkbox" id="mWaist"><span>腹部肥胖（男 ≧90cm，女 ≧80cm）</span></label>
-              <label class="chk"><input type="checkbox" id="mBp"><span>血壓 ≧130/85 或使用高血壓藥物</span></label>
-              <label class="chk"><input type="checkbox" id="mFpg"><span>空腹血糖 ≧100 或使用糖尿病藥物</span></label>
-              <label class="chk"><input type="checkbox" id="mTgMed"><span>使用治療 TG 之降血脂藥物</span></label>
-              <div class="autos" id="metsAutos"></div>
-            </div>
+          <label class="chk"><input type="checkbox" id="metsOn"><span>代謝症候群<span class="hint">下列五項符合三項以上；僅新制採計</span></span></label>
+          <div class="sub" id="metsSub">
+            <label class="chk"><input type="checkbox" id="mWaist"><span>腹部肥胖（男 ≧90cm，女 ≧80cm）</span></label>
+            <label class="chk"><input type="checkbox" id="mBp"><span>血壓 ≧130/85 或使用高血壓藥物</span></label>
+            <label class="chk"><input type="checkbox" id="mFpg"><span>空腹血糖 ≧100 或使用糖尿病藥物</span></label>
+            <label class="chk"><input type="checkbox" id="mTgMed"><span>使用治療 TG 之降血脂藥物</span></label>
+            <div class="autos" id="metsAutos"></div>
           </div>
         </div>
         <div class="autos" id="rfAutos"></div>
@@ -319,7 +308,7 @@ details.more .dc{padding:0 10px 10px}
       <h2>給付判定</h2>
       <div class="vsplit">
         <div class="v new">
-          <div class="v-top"><span class="v-tag">新制</span></div>
+          <div class="v-top"><span class="v-tag">表一 · 新制</span></div>
           <div class="v-body">
             <div class="v-level" id="nLevel">—</div>
             <div class="v-basis" id="nBasis"></div>
@@ -332,7 +321,7 @@ details.more .dc{padding:0 10px 10px}
           </div>
         </div>
         <div class="v old">
-          <div class="v-top"><span class="v-tag">舊制</span></div>
+          <div class="v-top"><span class="v-tag">表二 · 舊制</span></div>
           <div class="v-body">
             <div class="v-level" id="oLevel">—</div>
             <div class="v-basis" id="oBasis"></div>
@@ -352,7 +341,7 @@ details.more .dc{padding:0 10px 10px}
       <h2>處方與追蹤</h2>
       <div class="vsplit">
         <div class="v new">
-          <div class="v-top"><span class="v-tag">新制</span></div>
+          <div class="v-top"><span class="v-tag">表一 · 新制</span></div>
           <div class="v-body">
             <dl class="rl">
               <dt>符合給付的院內藥品</dt><dd id="drugNew"></dd>
@@ -363,7 +352,7 @@ details.more .dc{padding:0 10px 10px}
           </div>
         </div>
         <div class="v old">
-          <div class="v-top"><span class="v-tag">舊制</span></div>
+          <div class="v-top"><span class="v-tag">表二 · 舊制</span></div>
           <div class="v-body">
             <dl class="rl">
               <dt>符合給付的院內藥品</dt><dd id="drugOld"></dd>
@@ -378,7 +367,7 @@ details.more .dc{padding:0 10px 10px}
 
     <div class="card">
       <details>
-        <summary>新制條文依據（115/9/1 生效）</summary>
+        <summary>條文依據：表一（115/9/1 生效）</summary>
         <div class="dc">
           <p><b>ASCVD 風險等級與目標</b>　極高風險 LDL-C &lt;55（non-HDL-C &lt;85）／非常高風險 &lt;70（&lt;100）／高風險 &lt;100（&lt;130）／中風險 &lt;115（&lt;145）／低風險 &lt;130（&lt;160）／0 項風險因子 &lt;160。起始藥物治療門檻即為各該目標值。</p>
           <p><b>極高風險</b>　(一) 冠狀動脈疾病合併下列任一：一年內曾經歷心肌梗塞、≧兩次心肌梗塞病史、多支冠狀動脈阻塞、急性冠心症合併糖尿病、周邊動脈疾病或頸動脈狹窄。(二) 周邊動脈疾病合併冠狀動脈疾病或頸動脈狹窄。</p>
@@ -387,16 +376,21 @@ details.more .dc{padding:0 10px 10px}
           <p><b>中風險</b>　2 項（含）以上心血管風險因子。<b>低風險</b>　1 項心血管風險因子。</p>
           <p><b>心血管風險因子</b>　高血壓；男 ≧45 歲、女 ≧55 歲；早發性冠心病家族史（男 ≦55、女 ≦65）；HDL-C 男 &lt;40、女 &lt;50；抽菸；代謝症候群（腹部肥胖、血壓偏高、空腹血糖偏高、空腹 TG ≧150、HDL-C 偏低，五項符合三項）。</p>
           <p><b>判定順序</b>　條文明訂「若未符合上述高風險條件，應以列在低至中風險欄位的心血管風險因子數量作為風險評估」，故高風險以上不再回頭計算風險因子。</p>
+          <p><b>處方規定・極高、非常高、高風險</b>　一、起始治療：依據基線血脂值、用藥史和臨床狀況，給予中至高強度 statin 或合併 ezetimibe（高風險另註明「同時進行生活型態改變」）。二、經起始治療 6~8 週後，檢測血脂指標，如治療達標，則維持治療，並應每 6 個月追蹤血脂指標；如血脂值未達標，檢視服藥狀況，並考慮調整至高強度 statin 或最大耐受 statin 劑量，同時考慮合併 non-statin 治療，包含：ezetimibe、PCSK9 單株抗體、siRNA、ATP citrate lyase 抑制劑。三、更動治療 1~3 個月內需追蹤血脂值是否達標，如治療達標，則維持治療，並應每 6 個月追蹤血脂指標；如血脂值未達標，檢視服藥狀況，並考慮調整藥物組合。</p>
+          <p><b>處方規定・中、低風險</b>　一、起始治療：進行生活型態改變，並處置心血管風險因子。二、經起始治療 3~6 個月後，檢測血脂指標，如治療達標，則維持治療，並應每 6-12 個月追蹤血脂指標；如血脂值未達標，給予中強度 statin。三、中強度 statin 治療 6~8 週後追蹤血脂值是否達標，如治療達標，則維持治療，並應每 6-12 個月追蹤血脂指標；如血脂值未達標，檢視服藥狀況，並可給予高強度 statin 或最大耐受 statin 劑量或合併 non-statin 治療。</p>
+          <p><b>各風險等級評估建議・極高、非常高風險</b>　(一) 初始評估應檢測完整血脂指標，並應於急性病人入院後 24 小時內完成血脂檢驗。(二) 處置各項可改善心血管風險因子，包含：血壓、HbA1c、肥胖、抽菸、酒精攝取、生活型態。</p>
+          <p><b>各風險等級評估建議・高、中、低風險</b>　(一) 給予完整血脂指標檢測，辨識各項可改善心血管風險因子，包含：血壓、HbA1c、肥胖、抽菸、酒精攝取、生活型態。(二) ASCVD 風險分級為高風險，當有嚴重高膽固醇血症、肌腱黃色瘤、早發心血管疾病或家族病史時，應依照台灣家族性高膽固醇血症診斷標準進行家族性膽固醇血症篩檢。(三) 若未符合上述高風險條件，應以列在低至中風險欄位的心血管風險因子數量作為風險評估。</p>
+          <p><b>non-HDL-C</b>　當 LDL-C 達到理想治療目標後，非高密度脂蛋白-膽固醇（non-HDL-C）可作為血脂治療次要標的，其計算方式為總膽固醇數值減掉 HDL-C 數值，尤其適用於合併有高三酸甘油脂、糖尿病、或肥胖的病人以做進一步的心血管風險評估。</p>
         </div>
       </details>
       <details>
-        <summary>舊制條文依據（內容同 108/2/1 版）</summary>
+        <summary>條文依據：表二（內容同 108/2/1 版）</summary>
         <div class="dc">
           <p><b>ACS 病史；或曾接受心導管介入治療、外科冠動脈搭橋手術之冠狀動脈粥狀硬化患者</b>　起始 LDL-C ≧70，目標 LDL-C &lt;70。</p>
           <p><b>心血管疾病或糖尿病患者</b>　起始 TC ≧160 或 LDL-C ≧100，目標 TC &lt;160 或 LDL-C &lt;100。</p>
           <p><b>2 個危險因子或以上</b>　給藥前應有 3-6 個月非藥物治療；起始 TC ≧200 或 LDL-C ≧130。<b>1 個危險因子</b>　TC ≧240 或 LDL-C ≧160。<b>0 個危險因子</b>　LDL-C ≧190。</p>
-          <p><b>心血管疾病定義</b>　冠狀動脈粥狀硬化患者（心絞痛，有心導管證實或缺氧性心電圖變化或負荷性試驗陽性）；缺血型腦血管疾病（腦梗塞、TIA、有症狀之頸動脈狹窄）。</p>
-          <p><b>危險因子</b>　高血壓；男 ≧45 歲、女 ≧55 歲或停經；早發性冠心病家族史；HDL-C &lt;40；吸菸。</p>
+          <p><b>心血管疾病定義</b>　冠狀動脈粥狀硬化患者（心絞痛，有心導管證實或缺氧性心電圖變化或負荷性試驗陽性）；缺血型腦血管疾病（腦梗塞；暫時性腦缺血患者 TIA；有症狀之頸動脈狹窄。後二者之診斷須由神經科醫師確立）。</p>
+          <p><b>危險因子</b>　高血壓；男 ≧45 歲、女 ≧55 歲或停經；早發性冠心病家族史；HDL-C &lt;40；吸菸（因吸菸而符合起步治療準則之個案，若未戒菸而要求藥物治療，應以自費治療）。</p>
           <p><b>追蹤</b>　第一年應每 3-6 個月抽血檢查一次，第二年以後至少每 6-12 個月一次。</p>
         </div>
       </details>
@@ -430,7 +424,7 @@ details.more .dc{padding:0 10px 10px}
       <h2>風險等級與 LDL-C 目標</h2>
       <div class="tablewrap">
         <table>
-          <thead><tr><th>新制</th><th class="tgt">目標</th><th>舊制</th><th class="tgt">目標</th></tr></thead>
+          <thead><tr><th>表一 · 新制</th><th class="tgt">目標</th><th>表二 · 舊制</th><th class="tgt">目標</th></tr></thead>
           <tbody>
             <tr class="r-new"><td>極高風險</td><td class="tgt">&lt; 55</td><td>ACS 病史／曾 PCI・CABG</td><td class="tgt">&lt; 70</td></tr>
             <tr class="r-new"><td>非常高風險</td><td class="tgt">&lt; 70</td><td>心血管疾病或糖尿病</td><td class="tgt">&lt; 100</td></tr>
@@ -442,7 +436,7 @@ details.more .dc{padding:0 10px 10px}
         </table>
       </div>
       <div class="card-body" style="border-top:1px solid var(--line-2)">
-        <div class="call"><p>115/9/1 起新舊制並行，<b>依健保代碼認定</b>：多數降膽固醇藥品適用新制，健保署公告所列（降膽固醇藥 116 項、ezetimibe 4 項、複方 10 項）沿用舊制。</p></div>
+        <div class="call"><p>115/9/1 起兩表並行，<b>依健保代碼認定</b>：多數降膽固醇藥品適用表一，健保署公告所列（降膽固醇藥 116 項、ezetimibe 4 項、複方 10 項）沿用表二。</p></div>
       </div>
     </div>
   </div>
@@ -459,21 +453,21 @@ details.more .dc{padding:0 10px 10px}
 <script>
 const FORM=[
  {n:"Lipitor 40mg",            code:"BC22889100", ing:"atorvastatin 40mg", reg:"new", kind:"statin",
-  note:"院內唯一的新制高強度 statin，追 LDL-C &lt;55 的主力。"},
+  note:"院內唯一的表一高強度 statin，追 LDL-C &lt;55 的主力。"},
  {n:"Rosuvastatin Mylan 10mg", code:"BC26497100", ing:"rosuvastatin 10mg", reg:"new", kind:"statin",
-  note:"為升強度而改開 Crestor 20mg 會掉回舊制目標。"},
+  note:"為升強度而改開 Crestor 20mg 會掉回表二目標。"},
  {n:"Zulitor 4mg",             code:"AC58639100", ing:"pitavastatin 4mg", reg:"new", kind:"statin",
-  note:"同成分的 Livalo 2mg 屬舊制。"},
+  note:"同成分的 Livalo 2mg 屬表二。"},
  {n:"Ezetrol 10mg",            code:"BC24058100", ing:"ezetimibe 10mg", reg:"new", kind:"eze", wait:"6-8 週",
   note:"115/9/1 起 statin 單方 <b>6-8 週</b>未達標即可加（此前須 3 個月）；statin 不耐受者不受等待期限制。"},
  {n:"Vytorin 10/20mg",         code:"BC24250100", ing:"ezetimibe 10 + simvastatin 20", reg:"new", kind:"combo", wait:"6-8 週",
   note:"115/9/1 起 <b>6-8 週</b>即可換用，比 Cretrol 早 4-6 週。不得與 gemfibrozil 併用。"},
  {n:"Crestor 20mg",            code:"BC24129100", ing:"rosuvastatin 20mg", reg:"old", kind:"statin",
-  note:"高強度但屬舊制，目標降不到 &lt;55；改用 Lipitor 40mg。"},
+  note:"高強度但屬表二，目標降不到 &lt;55；改用 Lipitor 40mg。"},
  {n:"Livalo 2mg",              code:"BC25350100", ing:"pitavastatin 2mg", reg:"old", kind:"statin",
-  note:"同成分的 Zulitor 4mg 屬新制。"},
+  note:"同成分的 Zulitor 4mg 屬表一。"},
  {n:"Cretrol 10/10mg",         code:"BC28181100", ing:"ezetimibe 10 + rosuvastatin 10", reg:"old", kind:"combo", wait:"3 個月",
-  note:"2.6.3 條文所列，新舊制<b>都須</b> statin 單方滿 3 個月。不得與 gemfibrozil 併用。"}
+  note:"2.6.3 條文所列，兩表<b>都須</b> statin 單方滿 3 個月。不得與 gemfibrozil 併用。"}
 ];
 
 const NEW={
@@ -492,24 +486,27 @@ const OLD={
  E:{name:"0 個危險因子",ldl:190,tc:null,start:"LDL-C ≧190"}
 };
 
-// Each chip maps to a rule condition; a vascular diagnosis implies imaging-confirmed >=50% stenosis.
-const CAD_CHIP={id:"cad",label:"冠狀動脈疾病（CAD）"};
-const CAD_DETAILS=[
+// 每個 chip 對應一個條文條件；血管床診斷即隱含影像 ≧50% 狹窄
+const CHIPS=[
+ {id:"cad",     label:"冠狀動脈疾病"},
  {id:"acs",     label:"急性冠心症病史"},
  {id:"revasc",  label:"曾 PCI／CABG"},
  {id:"mi1y",    label:"一年內心肌梗塞"},
  {id:"mi2",     label:"≧2 次心肌梗塞"},
  {id:"multi",   label:"多支冠狀動脈阻塞"},
-];
-const OTHER_CHIPS=[
  {id:"carotid", label:"頸動脈狹窄"},
  {id:"pad",     label:"周邊動脈疾病"},
  {id:"stroke",  label:"缺血性中風／TIA"},
  {id:"dm",      label:"糖尿病"},
  {id:"ckd",     label:"慢性腎臟病"},
- {id:"cac400",  label:"CAC ≧400"}
+ {id:"cac400",  label:"CAC ≧400"},
+ {id:"ldl190",  label:"LDL-C 曾 ≧190"}
 ];
-const CHIPS=[CAD_CHIP,...CAD_DETAILS,...OTHER_CHIPS];
+// 冠狀動脈疾病的認定依據：表一非常高風險只認影像 ≧50%；表二三種認定方式皆可
+const CADBASIS=[
+ {v:"img", label:"影像 ≧50% 狹窄（心導管／CTA）"},
+ {v:"fx",  label:"負荷性試驗陽性／缺氧性 ECG"}
+];
 let cond={};
 
 const $=id=>document.getElementById(id);
@@ -519,14 +516,15 @@ const num=id=>{const v=parseFloat($(id).value);return isFinite(v)?v:null;};
 function readState(){
   const sex=document.querySelector('input[name=sex]:checked').value;
   const c=id=>!!cond[id];
-  // Any CAD detail implies CAD; every MI is treated as an ACS history for the old rule.
-  const cad=c("cad")||c("acs")||c("revasc")||c("mi1y")||c("mi2")||c("multi");
+  // 冠心病史的任一形式都代表冠狀動脈疾病
+  const cadChip=c("cad"), basis=cond.cadBasis||"img";
+  const cad=cadChip||c("acs")||c("revasc")||c("mi1y")||c("mi2")||c("multi");
   return {sex,age:num("age"),ldl:num("ldl"),tc:num("tc"),hdl:num("hdl"),tg:num("tg"),
     cad, pad:c("pad"), carotid:c("carotid"), stroke:c("stroke"),
-    acs:c("acs")||c("mi1y")||c("mi2"), revasc:c("revasc"), mi1y:c("mi1y"), mi2:c("mi2"), multi:c("multi"),
-    dm:c("dm"), ckd:c("ckd"), cac400:c("cac400"),
-    // 血管床一經診斷即視為影像確認 ≧50% 狹窄
-    img50: cad||c("pad")||c("carotid"),
+    acs:c("acs"), revasc:c("revasc"), mi1y:c("mi1y"), mi2:c("mi2"), multi:c("multi"),
+    dm:c("dm"), ckd:c("ckd"), cac400:c("cac400"), ldlEver190:c("ldl190"),
+    // 表一非常高風險(二)：僅影像確認 ≧50% 狹窄算數，負荷性試驗不算
+    img50: (cadChip&&basis==="img")||c("pad")||c("carotid"),
     strokeAthero: c("stroke"),
     padEv: c("pad"),
     htn:on("htn"),famhx:on("famhx"),smoke:on("smoke"),meno:on("meno"),
@@ -561,13 +559,6 @@ function oldFactors(s){
   if(s.smoke)f.push("吸菸");
   return f;
 }
-function missingRiskData(s,newRiskNeeded){
-  const missing=[];
-  if(s.age===null)missing.push("年齡");
-  if(s.hdl===null)missing.push("HDL-C");
-  if(newRiskNeeded&&s.metsOn&&!metsCount(s).met)missing.push("代謝症候群五項資料");
-  return missing;
-}
 function newLevel(s){
   if(s.cad&&(s.mi1y||s.mi2||s.multi||(s.acs&&s.dm)||s.pad||s.carotid)){
     const w=[];if(s.mi1y)w.push("一年內心肌梗塞");if(s.mi2)w.push("≧2 次心肌梗塞");if(s.multi)w.push("多支冠狀動脈阻塞");
@@ -586,7 +577,8 @@ function newLevel(s){
   const h=[];
   if(s.dm)h.push("糖尿病");
   if(s.ckd)h.push("慢性腎臟病");
-  if(s.ldl!==null&&s.ldl>=190)h.push("LDL-C ≧190");
+  if(s.ldlEver190)h.push("LDL-C 曾 ≧190");
+  else if(s.ldl!==null&&s.ldl>=190)h.push("LDL-C ≧190");
   if(s.cac400)h.push("CAC ≧400");
   if(h.length)return {k:"H",why:h.join("、")};
   const f=newFactors(s);
@@ -608,21 +600,9 @@ function oldLevel(s){
 }
 function statusEl(cur,target){
   if(cur===null)return '<div class="status na">未輸入 LDL-C</div>';
-  const d=Math.floor(cur-target+1);
-  if(cur<target)return '<div class="status ok">已達標　'+cur+' &lt; '+target+'</div>';
-  return '<div class="status bad">未達標　差 '+d+' mg/dL</div>';
-}
-function oldMetricStatus(label,cur,target){
-  if(cur===null)return '<div class="status na">'+label+' 未輸入</div>';
-  if(cur<target)return '<div class="status ok">'+label+' 已達標　'+cur+' &lt; '+target+'</div>';
-  const d=Math.floor(cur-target+1);
-  return '<div class="status bad">'+label+' 未達標　差 '+d+' mg/dL</div>';
-}
-function oldStatusEl(s,O){
-  const metrics=[];
-  if(O.tc!==null)metrics.push(oldMetricStatus('TC',s.tc,O.tc));
-  metrics.push(oldMetricStatus('LDL-C',s.ldl,O.ldl));
-  return '<div class="status-stack">'+metrics.join('')+'</div>';
+  const d=cur-target;
+  if(d<0)return '<div class="status ok">已達標　'+cur+' &lt; '+target+'</div>';
+  return '<div class="status bad">未達標　差 '+d.toFixed(0)+' mg/dL</div>';
 }
 const fmtDate=d=>(d.getMonth()+1)+"/"+d.getDate();
 const plusWeeks=w=>{const d=new Date();d.setDate(d.getDate()+w*7);return d;};
@@ -638,49 +618,39 @@ function render(){
   const any=CHIPS.some(c=>cond[c.id]);
   document.querySelectorAll("#chips .chip").forEach(c=>
     c.setAttribute("aria-pressed",String(c.dataset.id==="__none"?!any:!!cond[c.dataset.id])));
-  $("cadDetails").classList.toggle("hidden",!cond.cad);
-  const cadChip=$("chips").querySelector('[data-id="cad"]');
-  cadChip.setAttribute("aria-expanded",String(!!cond.cad));
+  $("cadSub").classList.toggle("hidden",!cond.cad);
+  document.querySelectorAll("#cadSub .chip").forEach(c=>
+    c.setAttribute("aria-pressed",String((cond.cadBasis||"img")===c.dataset.v)));
 
   const mc=metsCount(s);
-  $("metsAutos").innerHTML='<span class="auto-chip'+(mc.met?" on":"")+'">符合 '+mc.c+' / 5 項'+(mc.met?"　→ 成立":"")+'</span>'+ 
+  $("metsAutos").innerHTML='<span class="auto-chip'+(mc.met?" on":"")+'">符合 '+mc.c+' / 5 項'+(mc.met?"　→ 成立":"")+'</span>'+
     (mc.items.length?'<span class="auto-chip">'+mc.items.join("・")+'</span>':"");
   const nf=newFactors(s), of=oldFactors(s);
+  $("rfAutos").innerHTML='<span class="auto-chip'+(nf.length?" on":"")+'">新制計得 '+nf.length+' 項</span>'+
+                         '<span class="auto-chip'+(of.length?" on":"")+'">舊制計得 '+of.length+' 項</span>';
 
   const nl=newLevel(s), N=NEW[nl.k];
   const ol=oldLevel(s), O=OLD[ol.k];
 
-  // New rules short-circuit at high risk or above; old rules short-circuit only for ACS/CVD/diabetes.
+  // 表一短路於高風險以上；表二只在 ACS／心血管疾病或糖尿病時短路，其餘仍須數危險因子
   const newLocked=(nl.k==="VVH"||nl.k==="VH"||nl.k==="H");
   const oldLocked=(ol.k==="A"||ol.k==="B");
   const locked=newLocked&&oldLocked;
-  const needRiskData=!locked;
-  const missing=needRiskData?missingRiskData(s,!newLocked):[];
-  $("nonLdlFields").open=needRiskData;
-  $("menoWrap").classList.toggle("hidden",s.sex!=="F"||oldLocked);
-  $("newRiskFields").classList.toggle("hidden",newLocked);
-  const rfSummary=[];
-  if(!newLocked)rfSummary.push('<span class="auto-chip'+(nf.length?" on":"")+'">新制計得 '+nf.length+' 項</span>');
-  if(!oldLocked)rfSummary.push('<span class="auto-chip'+(of.length?" on":"")+'">舊制計得 '+of.length+' 項</span>');
-  $("rfAutos").innerHTML=rfSummary.join("");
-  document.querySelectorAll("[data-tier3]").forEach(el=>el.classList.toggle("hidden",!needRiskData));
+  document.querySelectorAll("[data-tier3]").forEach(el=>el.classList.toggle("hidden",locked));
 
   const notInOld=[];
   if(s.cac400)notInOld.push("CAC ≧400");
   if(s.ckd)notInOld.push("慢性腎臟病");
   if(s.pad)notInOld.push("周邊動脈疾病");
   const lock=$("lock");
-  lock.classList.toggle("hidden",!(locked||newLocked||missing.length));
-  lock.classList.toggle("ask",!locked);
+  lock.classList.toggle("hidden",!newLocked);
+  lock.classList.toggle("ask",newLocked&&!oldLocked);
   if(locked){
-    lock.innerHTML="已達 <b>"+N.name+"</b>。";
+    lock.innerHTML="已達 <b>"+N.name+"</b>，兩表都不再計算風險因子，相關欄位已收合。";
   }else if(newLocked){
-    lock.innerHTML="新制已達 <b>"+N.name+"</b>，但"+
-      (notInOld.length?"<b>"+notInOld.join("、")+"</b>不在舊制的判定條件內":"舊制尚未歸入心血管疾病")+
-      "，<b>舊制仍須計算危險因子</b>——請填下方欄位。"+
-      (missing.length?"尚需填寫：<b>"+missing.join("、")+"</b>；未填資料不視為沒有風險。":"");
-  }else if(missing.length){
-    lock.innerHTML="請填寫心血管風險因子及相關數據以完成判定。";
+    lock.innerHTML="表一已達 <b>"+N.name+"</b>，但"+
+      (notInOld.length?"<b>"+notInOld.join("、")+"</b>不在表二的判定條件內":"表二尚未歸入心血管疾病")+
+      "，<b>表二仍須計算危險因子</b>——請填下方欄位。";
   }
 
 
@@ -696,12 +666,12 @@ function render(){
   $("oStart").textContent=O.start;
   $("oTarget").innerHTML='&lt; '+O.ldl+' <span style="font-size:12px;font-weight:400;color:var(--ink-3)">mg/dL</span>';
   $("oTc").innerHTML=O.tc?('&lt; '+O.tc+(s.tc!==null?' <span style="color:var(--ink-3);font-size:12px">（現值 '+s.tc+'）</span>':'')):'—';
-  $("oStatus").innerHTML=oldStatusEl(s,O);
+  $("oStatus").innerHTML=statusEl(s.ldl,O.ldl);
 
   const gap=O.ldl-N.ldl;
   $("deltaBox").innerHTML='<div class="delta">'+(gap>0
-    ? '新舊制目標相差 <b>'+gap+' mg/dL</b>：新制品項可追到 <b>&lt;'+N.ldl+'</b>，舊制品項仍為 <b>&lt;'+O.ldl+'</b>。'
-    : '新舊制目標相同（<b>&lt;'+N.ldl+'</b>），選藥不影響目標值，但 ezetimibe 等待期仍有差異。')+'</div>';
+    ? '兩表目標相差 <b>'+gap+' mg/dL</b>：表一品項可追到 <b>&lt;'+N.ldl+'</b>，表二品項仍為 <b>&lt;'+O.ldl+'</b>。'
+    : '兩表目標相同（<b>&lt;'+N.ldl+'</b>），選藥不影響目標值，但 ezetimibe 等待期仍有差異。')+'</div>';
 
   const newSteps = (N.tier!=="low")
     ? ["<b>起始</b>　中至高強度 statin ± ezetimibe",
@@ -741,7 +711,7 @@ function render(){
     '<tr class="'+(d.reg==="new"?"r-new":"r-old")+'">'+
     '<td class="name">'+d.n+'<span class="ing">'+d.ing+'</span></td>'+
     '<td class="code">'+d.code+'</td>'+
-    '<td><span class="pill '+d.reg+'">'+(d.reg==="new"?"新制":"舊制")+'</span></td>'+
+    '<td><span class="pill '+d.reg+'">'+(d.reg==="new"?"表一 新制":"表二 舊制")+'</span></td>'+
     '<td class="note">'+d.note+'</td></tr>').join("");
 
   const nameList=a=>a.map(d=>'<b>'+d.n+'</b>').join('　·　');
@@ -761,24 +731,16 @@ function render(){
   fillRoute("new","drugNew","escNew");
   fillRoute("old","drugOld","escOld");
 
-  const chipHtml=c=>'<button type="button" class="chip" data-id="'+c.id+'" aria-pressed="false">'+c.label+'</button>';
-  $("chips").innerHTML='<div class="chip-group">'+
-    '<div class="chips">'+chipHtml(CAD_CHIP)+'</div>'+
-    '<div class="chip-sub hidden" id="cadDetails">'+
-      '<div class="chip-sub-title">CAD 細項（可複選）</div>'+
-      '<div class="chips">'+CAD_DETAILS.map(chipHtml).join("")+'</div>'+
-    '</div>'+
-  '</div>'+
-  '<div class="chips">'+OTHER_CHIPS.map(chipHtml).join("")+'</div>'+
-  '<button type="button" class="chip none" data-id="__none" aria-pressed="true">以上皆無</button>';
+  $("chips").innerHTML=CHIPS.map(c=>'<button type="button" class="chip" data-id="'+c.id+'" aria-pressed="false">'+c.label+'</button>').join("")
+    +'<button type="button" class="chip none" data-id="__none" aria-pressed="true">以上皆無</button>';
   document.querySelectorAll("#chips .chip").forEach(c=>c.addEventListener("click",()=>{
-    if(c.dataset.id==="__none")cond={};
-    else if(c.dataset.id==="cad"){
-      cond.cad=!cond.cad;
-      if(!cond.cad)CAD_DETAILS.forEach(d=>delete cond[d.id]);
-    }else cond[c.dataset.id]=!cond[c.dataset.id];
+    if(c.dataset.id==="__none")cond={}; else cond[c.dataset.id]=!cond[c.dataset.id];
     render();
   }));
+
+  $("cadSub").innerHTML=CADBASIS.map(b=>'<button type="button" class="chip" data-v="'+b.v+'" aria-pressed="false">'+b.label+'</button>').join("");
+  document.querySelectorAll("#cadSub .chip").forEach(c=>
+    c.addEventListener("click",()=>{cond.cadBasis=c.dataset.v;render();}));
 
   document.querySelectorAll(".tabs button").forEach(b=>b.addEventListener("click",()=>{
     document.querySelectorAll(".tabs button").forEach(x=>x.setAttribute("aria-selected",String(x===b)));
@@ -797,5 +759,3 @@ function render(){
   render();
 })();
 </script>
-</body>
-</html>
