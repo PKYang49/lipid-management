@@ -99,6 +99,8 @@ legend{
 .chip[aria-pressed="true"]{background:var(--focus);border-color:var(--focus);color:var(--on-accent);font-weight:600}
 .chip.none[aria-pressed="true"]{background:var(--ink-3);border-color:var(--ink-3)}
 .sub-chips{margin:8px 0 0 11px;padding-left:11px;border-left:2px solid var(--line-2)}
+.sub-label{font-family:ui-monospace,Menlo,monospace;font-size:9.5px;letter-spacing:.11em;text-transform:uppercase;color:var(--ink-3);margin:0 0 6px}
+.sub-chips .chips + .sub-label{margin-top:10px}
 .sub-chips .chip{font-size:12px;padding:5px 10px}
 .hint-inline{margin-top:10px;padding:8px 10px;border-left:2px solid var(--focus);background:var(--panel-2);font-size:11.5px;color:var(--ink-2);line-height:1.5}
 .hero-f{display:flex;align-items:center;gap:12px}
@@ -237,7 +239,12 @@ details.more .dc{padding:0 10px 10px}
       <fieldset>
         <legend>病史與共病</legend>
         <div class="chips" id="chips"></div>
-        <div class="chips sub-chips hidden" id="cadSub"></div>
+        <div class="sub-chips hidden" id="cadSub">
+          <div class="sub-label">認定依據</div>
+          <div class="chips" id="cadBasis"></div>
+          <div class="sub-label">合併狀況</div>
+          <div class="chips" id="cadEvents"></div>
+        </div>
         <div class="hint-inline" id="presetHint">可複選。周邊動脈疾病與頸動脈狹窄以影像 ≧50% 直徑狹窄認定。</div>
       </fieldset>
 
@@ -489,11 +496,6 @@ const OLD={
 // 每個 chip 對應一個條文條件；血管床診斷即隱含影像 ≧50% 狹窄
 const CHIPS=[
  {id:"cad",     label:"冠狀動脈疾病"},
- {id:"acs",     label:"急性冠心症病史"},
- {id:"revasc",  label:"曾 PCI／CABG"},
- {id:"mi1y",    label:"一年內心肌梗塞"},
- {id:"mi2",     label:"≧2 次心肌梗塞"},
- {id:"multi",   label:"多支冠狀動脈阻塞"},
  {id:"carotid", label:"頸動脈狹窄"},
  {id:"pad",     label:"周邊動脈疾病"},
  {id:"stroke",  label:"缺血性中風／TIA"},
@@ -501,6 +503,14 @@ const CHIPS=[
  {id:"ckd",     label:"慢性腎臟病"},
  {id:"cac400",  label:"CAC ≧400"},
  {id:"ldl190",  label:"LDL-C 曾 ≧190"}
+];
+// 冠狀動脈疾病底下的合併狀況，決定表一極高／非常高風險
+const CADEVENTS=[
+ {id:"acs",    label:"急性冠心症病史"},
+ {id:"revasc", label:"曾 PCI／CABG"},
+ {id:"mi1y",   label:"一年內心肌梗塞"},
+ {id:"mi2",    label:"≧2 次心肌梗塞"},
+ {id:"multi",  label:"多支冠狀動脈阻塞"}
 ];
 // 冠狀動脈疾病的認定依據：表一非常高風險只認影像 ≧50%；表二三種認定方式皆可
 const CADBASIS=[
@@ -619,8 +629,10 @@ function render(){
   document.querySelectorAll("#chips .chip").forEach(c=>
     c.setAttribute("aria-pressed",String(c.dataset.id==="__none"?!any:!!cond[c.dataset.id])));
   $("cadSub").classList.toggle("hidden",!cond.cad);
-  document.querySelectorAll("#cadSub .chip").forEach(c=>
+  document.querySelectorAll("#cadBasis .chip").forEach(c=>
     c.setAttribute("aria-pressed",String((cond.cadBasis||"img")===c.dataset.v)));
+  document.querySelectorAll("#cadEvents .chip").forEach(c=>
+    c.setAttribute("aria-pressed",String(!!cond[c.dataset.id])));
 
   const mc=metsCount(s);
   $("metsAutos").innerHTML='<span class="auto-chip'+(mc.met?" on":"")+'">符合 '+mc.c+' / 5 項'+(mc.met?"　→ 成立":"")+'</span>'+
@@ -734,13 +746,23 @@ function render(){
   $("chips").innerHTML=CHIPS.map(c=>'<button type="button" class="chip" data-id="'+c.id+'" aria-pressed="false">'+c.label+'</button>').join("")
     +'<button type="button" class="chip none" data-id="__none" aria-pressed="true">以上皆無</button>';
   document.querySelectorAll("#chips .chip").forEach(c=>c.addEventListener("click",()=>{
-    if(c.dataset.id==="__none")cond={}; else cond[c.dataset.id]=!cond[c.dataset.id];
+    const id=c.dataset.id;
+    if(id==="__none"){cond={};}
+    else{
+      cond[id]=!cond[id];
+      // 取消冠狀動脈疾病時一併清掉底下的認定依據與合併狀況，避免留下看不見的條件
+      if(id==="cad"&&!cond.cad){delete cond.cadBasis;CADEVENTS.forEach(e=>delete cond[e.id]);}
+    }
     render();
   }));
 
-  $("cadSub").innerHTML=CADBASIS.map(b=>'<button type="button" class="chip" data-v="'+b.v+'" aria-pressed="false">'+b.label+'</button>').join("");
-  document.querySelectorAll("#cadSub .chip").forEach(c=>
+  $("cadBasis").innerHTML=CADBASIS.map(b=>'<button type="button" class="chip" data-v="'+b.v+'" aria-pressed="false">'+b.label+'</button>').join("");
+  document.querySelectorAll("#cadBasis .chip").forEach(c=>
     c.addEventListener("click",()=>{cond.cadBasis=c.dataset.v;render();}));
+
+  $("cadEvents").innerHTML=CADEVENTS.map(e=>'<button type="button" class="chip" data-id="'+e.id+'" aria-pressed="false">'+e.label+'</button>').join("");
+  document.querySelectorAll("#cadEvents .chip").forEach(c=>
+    c.addEventListener("click",()=>{cond[c.dataset.id]=!cond[c.dataset.id];render();}));
 
   document.querySelectorAll(".tabs button").forEach(b=>b.addEventListener("click",()=>{
     document.querySelectorAll(".tabs button").forEach(x=>x.setAttribute("aria-selected",String(x===b)));
