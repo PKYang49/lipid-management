@@ -462,7 +462,7 @@ const FORM=[
  {n:"Lipitor 40mg",            code:"BC22889100", ing:"atorvastatin 40mg", reg:"new", kind:"statin",
   note:"院內唯一的表一高強度 statin。"},
  {n:"Rosuvastatin Mylan 10mg", code:"BC26497100", ing:"rosuvastatin 10mg", reg:"new", kind:"statin",
-  note:"為升強度而改開 Crestor 20mg 會掉回表二目標。"},
+  note:"同成份的Crestor 20mg 屬舊制。"},
  {n:"Zulitor 4mg",             code:"AC58639100", ing:"pitavastatin 4mg", reg:"new", kind:"statin",
   note:"同成分的 Livalo 2mg 屬表二。"},
  {n:"Ezetrol 10mg",            code:"BC24058100", ing:"ezetimibe 10mg", reg:"new", kind:"eze", wait:"6-8 週",
@@ -726,7 +726,7 @@ function render(){
     '<tr class="'+(d.reg==="new"?"r-new":"r-old")+'">'+
     '<td class="name">'+d.n+'<span class="ing">'+d.ing+'</span></td>'+
     '<td class="code">'+d.code+'</td>'+
-    '<td><span class="pill '+d.reg+'">'+(d.reg==="new"?"表一 新制":"表二 舊制")+'</span></td>'+
+    '<td><span class="pill '+d.reg+'">'+(d.reg==="new"?"新制":"舊制")+'</span></td>'+
     '<td class="note">'+d.note+'</td></tr>').join("");
 
   const nameList=a=>a.map(d=>'<b>'+d.n+'</b>').join('　·　');
