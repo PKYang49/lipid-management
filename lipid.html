@@ -1,4 +1,4 @@
-<title>血脂給付判定台</title>
+<title>血脂給付規範評估工具</title>
 <style>
 :root{
   --ground:#EDF1F3; --panel:#FFFFFF; --panel-2:#F6F9FA;
@@ -218,12 +218,12 @@ details.more .dc{padding:0 10px 10px}
   <div class="mast-in">
     <div>
       <div class="eyebrow">健保給付規定 2.6.1 / 2.6.2 / 2.6.3</div>
-      <h1>血脂藥物新舊制判定台</h1>
-      <p>點選情境，同時得出表一與表二的給付門檻與用藥路徑。</p>
+      <h1>血脂給付規範評估工具</h1>
+      <p>點選情境，同時得出新制與舊制的給付門檻與用藥路徑。</p>
     </div>
   </div>
   <div class="tabs" role="tablist">
-    <button type="button" role="tab" aria-selected="true" data-tab="calc">判定台</button>
+    <button type="button" role="tab" aria-selected="true" data-tab="calc">給付評估</button>
     <button type="button" role="tab" aria-selected="false" data-tab="drugs">本院藥品對照</button>
   </div>
 </header>
@@ -315,7 +315,7 @@ details.more .dc{padding:0 10px 10px}
       <h2>給付判定</h2>
       <div class="vsplit">
         <div class="v new">
-          <div class="v-top"><span class="v-tag">表一 · 新制</span></div>
+          <div class="v-top"><span class="v-tag">新制</span></div>
           <div class="v-body">
             <div class="v-level" id="nLevel">—</div>
             <div class="v-basis" id="nBasis"></div>
@@ -328,7 +328,7 @@ details.more .dc{padding:0 10px 10px}
           </div>
         </div>
         <div class="v old">
-          <div class="v-top"><span class="v-tag">表二 · 舊制</span></div>
+          <div class="v-top"><span class="v-tag">舊制</span></div>
           <div class="v-body">
             <div class="v-level" id="oLevel">—</div>
             <div class="v-basis" id="oBasis"></div>
@@ -348,7 +348,7 @@ details.more .dc{padding:0 10px 10px}
       <h2>處方與追蹤</h2>
       <div class="vsplit">
         <div class="v new">
-          <div class="v-top"><span class="v-tag">表一 · 新制</span></div>
+          <div class="v-top"><span class="v-tag">新制</span></div>
           <div class="v-body">
             <dl class="rl">
               <dt>符合給付的院內藥品</dt><dd id="drugNew"></dd>
@@ -359,7 +359,7 @@ details.more .dc{padding:0 10px 10px}
           </div>
         </div>
         <div class="v old">
-          <div class="v-top"><span class="v-tag">表二 · 舊制</span></div>
+          <div class="v-top"><span class="v-tag">舊制</span></div>
           <div class="v-body">
             <dl class="rl">
               <dt>符合給付的院內藥品</dt><dd id="drugOld"></dd>
@@ -374,7 +374,7 @@ details.more .dc{padding:0 10px 10px}
 
     <div class="card">
       <details>
-        <summary>條文依據：表一（115/9/1 生效）</summary>
+        <summary>條文依據：新制（115/9/1 生效）</summary>
         <div class="dc">
           <p><b>ASCVD 風險等級與目標</b>　極高風險 LDL-C &lt;55（non-HDL-C &lt;85）／非常高風險 &lt;70（&lt;100）／高風險 &lt;100（&lt;130）／中風險 &lt;115（&lt;145）／低風險 &lt;130（&lt;160）／0 項風險因子 &lt;160。起始藥物治療門檻即為各該目標值。</p>
           <p><b>極高風險</b>　(一) 冠狀動脈疾病合併下列任一：一年內曾經歷心肌梗塞、≧兩次心肌梗塞病史、多支冠狀動脈阻塞、急性冠心症合併糖尿病、周邊動脈疾病或頸動脈狹窄。(二) 周邊動脈疾病合併冠狀動脈疾病或頸動脈狹窄。</p>
@@ -391,7 +391,7 @@ details.more .dc{padding:0 10px 10px}
         </div>
       </details>
       <details>
-        <summary>條文依據：表二（內容同 108/2/1 版）</summary>
+        <summary>條文依據：舊制（內容同 108/2/1 版）</summary>
         <div class="dc">
           <p><b>ACS 病史；或曾接受心導管介入治療、外科冠動脈搭橋手術之冠狀動脈粥狀硬化患者</b>　起始 LDL-C ≧70，目標 LDL-C &lt;70。</p>
           <p><b>心血管疾病或糖尿病患者</b>　起始 TC ≧160 或 LDL-C ≧100，目標 TC &lt;160 或 LDL-C &lt;100。</p>
@@ -431,7 +431,7 @@ details.more .dc{padding:0 10px 10px}
       <h2>風險等級與 LDL-C 目標</h2>
       <div class="tablewrap">
         <table>
-          <thead><tr><th>表一 · 新制</th><th class="tgt">目標</th><th>表二 · 舊制</th><th class="tgt">目標</th></tr></thead>
+          <thead><tr><th>新制</th><th class="tgt">目標</th><th>舊制</th><th class="tgt">目標</th></tr></thead>
           <tbody>
             <tr class="r-new"><td>極高風險</td><td class="tgt">&lt; 55</td><td>ACS 病史／曾 PCI・CABG</td><td class="tgt">&lt; 70</td></tr>
             <tr class="r-new"><td>非常高風險</td><td class="tgt">&lt; 70</td><td>心血管疾病或糖尿病</td><td class="tgt">&lt; 100</td></tr>
@@ -443,7 +443,7 @@ details.more .dc{padding:0 10px 10px}
         </table>
       </div>
       <div class="card-body" style="border-top:1px solid var(--line-2)">
-        <div class="call"><p>115/9/1 起兩表並行，<b>依健保代碼認定</b>：多數降膽固醇藥品適用表一，健保署公告所列（降膽固醇藥 116 項、ezetimibe 4 項、複方 10 項）沿用表二。</p></div>
+        <div class="call"><p>115/9/1 起新舊制並行，<b>依健保代碼認定</b>：多數降膽固醇藥品適用新制，健保署公告所列（降膽固醇藥 116 項、ezetimibe 4 項、複方 10 項）沿用舊制。</p></div>
       </div>
     </div>
   </div>
@@ -460,19 +460,19 @@ details.more .dc{padding:0 10px 10px}
 <script>
 const FORM=[
  {n:"Lipitor 40mg",            code:"BC22889100", ing:"atorvastatin 40mg", reg:"new", kind:"statin",
-  note:"院內唯一的表一高強度 statin。"},
+  note:"院內唯一的新制高強度 statin。"},
  {n:"Rosuvastatin Mylan 10mg", code:"BC26497100", ing:"rosuvastatin 10mg", reg:"new", kind:"statin",
   note:"同成份的Crestor 20mg 屬舊制。"},
  {n:"Zulitor 4mg",             code:"AC58639100", ing:"pitavastatin 4mg", reg:"new", kind:"statin",
-  note:"同成分的 Livalo 2mg 屬表二。"},
+  note:"同成分的 Livalo 2mg 屬舊制。"},
  {n:"Ezetrol 10mg",            code:"BC24058100", ing:"ezetimibe 10mg", reg:"new", kind:"eze", wait:"6-8 週",
   note:"115/9/1 起 statin 單方 <b>6-8 週</b>未達標即可加（此前須 3 個月）；statin 不耐受者不受等待期限制。"},
  {n:"Vytorin 10/20mg",         code:"BC24250100", ing:"ezetimibe 10 + simvastatin 20", reg:"new", kind:"combo", wait:"6-8 週",
   note:"115/9/1 起 <b>6-8 週</b>即可換用，比 Cretrol 早 4-6 週。不得與 gemfibrozil 併用。"},
  {n:"Crestor 20mg",            code:"BC24129100", ing:"rosuvastatin 20mg", reg:"old", kind:"statin",
-  note:"高強度但屬表二，目標降不到 &lt;55；改用 Lipitor 40mg。"},
+  note:"高強度但屬舊制，目標降不到 &lt;55；改用 Lipitor 40mg。"},
  {n:"Livalo 2mg",              code:"BC25350100", ing:"pitavastatin 2mg", reg:"old", kind:"statin",
-  note:"同成分的 Zulitor 4mg 屬表一。"},
+  note:"同成分的 Zulitor 4mg 屬新制。"},
  {n:"Cretrol 10/10mg",         code:"BC28181100", ing:"ezetimibe 10 + rosuvastatin 10", reg:"old", kind:"combo", wait:"3 個月",
   note:"2.6.3 條文所列，兩表<b>都須</b> statin 單方滿 3 個月。不得與 gemfibrozil 併用。"}
 ];
@@ -504,14 +504,14 @@ const CHIPS=[
  {id:"cac400",  label:"CAC ≧400"},
  {id:"ldl190",  label:"LDL-C 曾 ≧190"}
 ];
-// 冠狀動脈疾病底下的合併狀況，決定表一極高／非常高風險
+// 冠狀動脈疾病底下的合併狀況，決定新制極高／非常高風險
 const CADEVENTS=[
  {id:"revasc", label:"曾 PCI／CABG"},
  {id:"mi1y",   label:"一年內心肌梗塞"},
  {id:"mi2",    label:"≧2 次心肌梗塞"},
  {id:"multi",  label:"多支冠狀動脈阻塞"}
 ];
-// 冠狀動脈疾病的認定依據，可複選：只有影像 ≧50% 走表一非常高風險(二)，ACS 走(一)1
+// 冠狀動脈疾病的認定依據，可複選：只有影像 ≧50% 走新制非常高風險(二)，ACS 走(一)1
 const CADBASIS=[
  {id:"cadImg", label:"影像 ≧50% 狹窄（心導管／CTA）"},
  {id:"cadFx",  label:"負荷性試驗陽性／缺氧性 ECG"},
@@ -534,7 +534,7 @@ function readState(){
     cad, pad:c("pad"), carotid:c("carotid"), stroke:c("stroke"),
     acs, revasc:c("revasc"), mi1y:c("mi1y"), mi2:c("mi2"), multi:c("multi"),
     dm:c("dm"), ckd:c("ckd"), cac400:c("cac400"), ldlEver190:c("ldl190"),
-    // 表一非常高風險(二)：僅影像確認 ≧50% 狹窄算數，負荷性試驗不算
+    // 新制非常高風險(二)：僅影像確認 ≧50% 狹窄算數，負荷性試驗不算
     img50: (cadChip&&c("cadImg"))||c("pad")||c("carotid"),
     strokeAthero: c("stroke"),
     padEv: c("pad"),
@@ -647,7 +647,7 @@ function render(){
   const nl=newLevel(s), N=NEW[nl.k];
   const ol=oldLevel(s), O=OLD[ol.k];
 
-  // 表一短路於高風險以上；表二只在 ACS／心血管疾病或糖尿病時短路，其餘仍須數危險因子
+  // 新制短路於高風險以上；舊制只在 ACS／心血管疾病或糖尿病時短路，其餘仍須數危險因子
   const newLocked=(nl.k==="VVH"||nl.k==="VH"||nl.k==="H");
   const oldLocked=(ol.k==="A"||ol.k==="B");
   const locked=newLocked&&oldLocked;
@@ -663,9 +663,9 @@ function render(){
   if(locked){
     lock.innerHTML="已達 <b>"+N.name+"</b>，兩表都不再計算風險因子，相關欄位已收合。";
   }else if(newLocked){
-    lock.innerHTML="表一已達 <b>"+N.name+"</b>，但"+
-      (notInOld.length?"<b>"+notInOld.join("、")+"</b>不在表二的判定條件內":"表二尚未歸入心血管疾病")+
-      "，<b>表二仍須計算危險因子</b>——請填下方欄位。";
+    lock.innerHTML="新制已達 <b>"+N.name+"</b>，但"+
+      (notInOld.length?"<b>"+notInOld.join("、")+"</b>不在舊制的判定條件內":"舊制尚未歸入心血管疾病")+
+      "，<b>舊制仍須計算危險因子</b>——請填下方欄位。";
   }
 
 
@@ -685,8 +685,8 @@ function render(){
 
   const gap=O.ldl-N.ldl;
   $("deltaBox").innerHTML='<div class="delta">'+(gap>0
-    ? '兩表目標相差 <b>'+gap+' mg/dL</b>：表一品項可追到 <b>&lt;'+N.ldl+'</b>，表二品項仍為 <b>&lt;'+O.ldl+'</b>。'
-    : '兩表目標相同（<b>&lt;'+N.ldl+'</b>），選藥不影響目標值，但 ezetimibe 等待期仍有差異。')+'</div>';
+    ? '新舊制目標相差 <b>'+gap+' mg/dL</b>：新制品項可追到 <b>&lt;'+N.ldl+'</b>，舊制品項仍為 <b>&lt;'+O.ldl+'</b>。'
+    : '新舊制目標相同（<b>&lt;'+N.ldl+'</b>），選藥不影響目標值，但 ezetimibe 等待期仍有差異。')+'</div>';
 
   const newSteps = (N.tier!=="low")
     ? ["<b>起始</b>　中至高強度 statin ± ezetimibe",
