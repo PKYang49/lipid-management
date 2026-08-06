@@ -322,9 +322,9 @@ details.more .dc{padding:0 10px 10px}
           <summary>TC／HDL-C／TG</summary>
           <div class="dc">
             <div class="row">
-              <div class="f"><label for="tc">TC</label><input id="tc" type="number" min="0" value="196"></div>
-              <div class="f"><label for="hdl">HDL-C</label><input id="hdl" type="number" min="0" value="38"></div>
-              <div class="f"><label for="tg">TG</label><input id="tg" type="number" min="0" value="180"></div>
+              <div class="f"><label for="tc">TC</label><input id="tc" type="number" min="0"></div>
+              <div class="f"><label for="hdl">HDL-C</label><input id="hdl" type="number" min="0"></div>
+              <div class="f"><label for="tg">TG</label><input id="tg" type="number" min="0"></div>
             </div>
             <div class="autos"><span class="auto-chip" id="chipNonHdl">non-HDL-C —</span></div>
           </div>
@@ -730,6 +730,8 @@ function render(){
   const oldLocked=(ol.k==="A"||ol.k==="B");
   const locked=newLocked&&oldLocked;
   document.querySelectorAll("[data-tier3]").forEach(el=>el.classList.toggle("hidden",locked));
+  const nonLdlDetails=document.querySelector("details.more");
+  if(nonLdlDetails)nonLdlDetails.open=!locked;
 
   const notInOld=[];
   if(s.cac400)notInOld.push("CAC ≧400");
