@@ -125,6 +125,7 @@ legend{
 .autos{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px}
 .auto-chip{font-family:ui-monospace,Menlo,monospace;font-size:10.5px;padding:3px 8px;border:1px solid var(--line);border-radius:2px;color:var(--ink-3);background:var(--panel-2)}
 .auto-chip.on{border-color:var(--focus);color:var(--focus);background:transparent;font-weight:600}
+.auto-chip.warn{border-color:var(--bad);color:var(--bad);background:transparent;font-weight:600}
 .radio-row{display:flex}
 .radio-row label{flex:1;text-align:center;font-size:13.5px;padding:7px 0;border:1px solid var(--line);cursor:pointer;background:var(--panel-2);color:var(--ink-2)}
 .radio-row label:first-child{border-radius:2px 0 0 2px}
@@ -583,6 +584,8 @@ const CADBASIS=[
 let cond={};
 let mBpAuto=false;
 let htnWasChecked=false;
+let lipidAutoOpen=false;
+let lockedWas=null;
 
 const $=id=>document.getElementById(id);
 const on=id=>$(id).checked;
@@ -719,8 +722,16 @@ function render(){
   $("metsAutos").innerHTML='<span class="auto-chip'+(mc.met?" on":"")+'">符合 '+mc.c+' / 5 項'+(mc.met?"　→ 成立":"")+'</span>'+
     (mc.items.length?'<span class="auto-chip">'+mc.items.join("・")+'</span>':"");
   const nf=newFactors(s), of=oldFactors(s);
+  const miss=[];
+  if(nf.length<=1||of.length<=1){        // 已達 2 項者再多也不會改變等級，就不吵
+    if(s.age===null)miss.push("年齡");
+    if(s.hdl===null)miss.push("HDL-C");
+    // TG 只餵代謝症候群，且該症候群需五取三：其他項剛好 2 項時補填 TG 才可能改變結果
+    if(s.metsOn&&s.tg===null&&!s.mTgMed&&mc.c===2)miss.push("TG");
+  }
   $("rfAutos").innerHTML='<span class="auto-chip'+(nf.length?" on":"")+'">新制計得 '+nf.length+' 項</span>'+
-                         '<span class="auto-chip'+(of.length?" on":"")+'">舊制計得 '+of.length+' 項</span>';
+                         '<span class="auto-chip'+(of.length?" on":"")+'">舊制計得 '+of.length+' 項</span>'+
+                         (miss.length?'<span class="auto-chip warn">⚠︎ '+miss.join("、")+' 未填，可能少計風險因子</span>':'');
 
   const nl=newLevel(s), N=NEW[nl.k];
   const ol=oldLevel(s), O=OLD[ol.k];
@@ -731,7 +742,12 @@ function render(){
   const locked=newLocked&&oldLocked;
   document.querySelectorAll("[data-tier3]").forEach(el=>el.classList.toggle("hidden",locked));
   const nonLdlDetails=document.querySelector("details.more");
-  if(nonLdlDetails)nonLdlDetails.open=!locked;
+  if(nonLdlDetails){
+    // 進入「需數風險因子」時自動展開；離開時只收回自己展開的，使用者手動開的保留
+    if(!locked&&lockedWas!==false){nonLdlDetails.open=true;lipidAutoOpen=true;}
+    else if(locked&&lockedWas===false&&lipidAutoOpen){nonLdlDetails.open=false;lipidAutoOpen=false;}
+    lockedWas=locked;
+  }
 
   const notInOld=[];
   if(s.cac400)notInOld.push("CAC ≧400");
@@ -861,6 +877,8 @@ function render(){
     cond={};
     mBpAuto=false;
     htnWasChecked=false;
+    lipidAutoOpen=false;
+    lockedWas=null;
     document.querySelectorAll("#f input[type=checkbox]").forEach(c=>c.checked=false);
     ["age","ldl","tc","hdl","tg"].forEach(id=>$(id).value="");
     render();
