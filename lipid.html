@@ -835,7 +835,7 @@ function render(){
         nameList(add.filter(d=>d.kind==="combo"))
       : '院內無此表的 ezetimibe 品項。';
     if(reg==="new")esc+='。再不足：PCSK9 單抗／siRNA／ATP citrate lyase 抑制劑（需事前審查）。';
-    else esc='改Cretrol 10/10mg 或其他ezetimbe based therapy。不得與 gemfibrozil 併用。';
+    else esc='改<b>Cretrol 10/10mg</b> 或其他<b>ezetimbe based therapy</b>。不得與 gemfibrozil 併用。';
     $(drugEl).innerHTML=nameList(all);
     $(escEl).innerHTML=esc;
   };
