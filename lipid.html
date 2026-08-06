@@ -469,7 +469,7 @@ details.more .dc{padding:0 10px 10px}
         <summary>條文依據：2.6.2 Ezetimibe 與 2.6.3 複方</summary>
         <div class="dc">
           <p><b>2.6.2（115/9/1 起）</b>　限原發性高膽固醇血症、同型接合子家族性高膽固醇血症、同型接合子性植物固醇血症，並符合下列之一：對 statins 發生無法耐受之藥物不良反應（如 severe myalgia、myositis）；或經 statins 單一治療 <b>6-8 週</b>未達治療目標者，得合併使用。惟 Ezetity、Ezzicad、Ezta 10、Ezetimibe Sandoz 等 4 品項須滿 <b>3 個月</b>。</p>
-          <p><b>2.6.3（115/9/1 起）</b>　限原發性高膽固醇血症、HoFH 病患；經 statin 單一治療 <b>6-8 週</b>未達治療目標者得使用。惟 Agitin、Sacure、Ezta-SM、Zoliton、Zovastin、Cretrol、Livazebe 等 10 品項須滿 <b>3 個月</b>。本品不得與 gemfibrozil 併用。</p>
+          <p><b>2.6.3（115/9/1 起）</b>　限原發性高膽固醇血症、HoFH 病患；經 statin 單一治療 <b>6-8 週</b>未達治療目標者得使用。惟 Agitin、Sacure、Ezta-SM、Zoliton、Zovastin、Cretrol、Livazebe 等 10 品項須滿 <b>3 個月</b>。</p>
           <p>新制同時刪去了舊條文中「並符合全民健康保險降血脂藥物給付規定表」之綁定文字。115/8/31 前，ezetimibe 與複方一律須 statin 單方滿 3 個月。</p>
         </div>
       </details>
@@ -532,13 +532,13 @@ const FORM=[
  {n:"Ezetrol 10mg",            code:"BC24058100", ing:"ezetimibe 10mg", reg:"new", kind:"eze", wait:"6-8 週",
   note:"115/9/1 起 statin 單方 <b>6-8 週</b>未達標即可加（此前須 3 個月）；statin 不耐受者不受等待期限制。"},
  {n:"Vytorin 10/20mg",         code:"BC24250100", ing:"ezetimibe 10 + simvastatin 20", reg:"new", kind:"combo", wait:"6-8 週",
-  note:"115/9/1 起 <b>6-8 週</b>即可換用，比 Cretrol 早 4-6 週。不得與 gemfibrozil 併用。"},
+  note:"115/9/1 起 <b>6-8 週</b>即可換用，比 Cretrol 早 4-6 週。"},
  {n:"Crestor 20mg",            code:"BC24129100", ing:"rosuvastatin 20mg", reg:"old", kind:"statin",
   note:"高強度但屬舊制，目標降不到 &lt;55；改用 Lipitor 40mg。"},
  {n:"Livalo 2mg",              code:"BC25350100", ing:"pitavastatin 2mg", reg:"old", kind:"statin",
   note:"同成分的 Zulitor 4mg 屬新制。"},
  {n:"Cretrol 10/10mg",         code:"BC28181100", ing:"ezetimibe 10 + rosuvastatin 10", reg:"old", kind:"combo", wait:"3 個月",
-  note:"2.6.3 條文所列，新舊制<b>都須</b> statin 單方滿 3 個月。不得與 gemfibrozil 併用。"}
+  note:"2.6.3 條文所列，新舊制<b>都須</b> statin 單方滿 3 個月。"}
 ];
 
 const NEW={
@@ -835,7 +835,7 @@ function render(){
         nameList(add.filter(d=>d.kind==="combo"))
       : '院內無此表的 ezetimibe 品項。';
     if(reg==="new")esc+='。再不足：PCSK9 單抗／siRNA／ATP citrate lyase 抑制劑（需事前審查）。';
-    else esc='改<b>Cretrol 10/10mg</b> 或其他<b>ezetimbe based therapy</b>。不得與 gemfibrozil 併用。';
+    else esc='改<b>Cretrol 10/10mg</b> 或其他<b>ezetimbe based therapy</b>。';
     $(drugEl).innerHTML=nameList(all);
     $(escEl).innerHTML=esc;
   };
