@@ -506,16 +506,16 @@ const CHIPS=[
 ];
 // 冠狀動脈疾病底下的合併狀況，決定表一極高／非常高風險
 const CADEVENTS=[
- {id:"acs",    label:"急性冠心症病史"},
  {id:"revasc", label:"曾 PCI／CABG"},
  {id:"mi1y",   label:"一年內心肌梗塞"},
  {id:"mi2",    label:"≧2 次心肌梗塞"},
  {id:"multi",  label:"多支冠狀動脈阻塞"}
 ];
-// 冠狀動脈疾病的認定依據：表一非常高風險只認影像 ≧50%；表二三種認定方式皆可
+// 冠狀動脈疾病的認定依據，可複選：只有影像 ≧50% 走表一非常高風險(二)，ACS 走(一)1
 const CADBASIS=[
- {v:"img", label:"影像 ≧50% 狹窄（心導管／CTA）"},
- {v:"fx",  label:"負荷性試驗陽性／缺氧性 ECG"}
+ {id:"cadImg", label:"影像 ≧50% 狹窄（心導管／CTA）"},
+ {id:"cadFx",  label:"負荷性試驗陽性／缺氧性 ECG"},
+ {id:"cadAcs", label:"ACS 病史"}
 ];
 let cond={};
 
@@ -527,14 +527,15 @@ function readState(){
   const sex=document.querySelector('input[name=sex]:checked').value;
   const c=id=>!!cond[id];
   // 冠心病史的任一形式都代表冠狀動脈疾病
-  const cadChip=c("cad"), basis=cond.cadBasis||"img";
-  const cad=cadChip||c("acs")||c("revasc")||c("mi1y")||c("mi2")||c("multi");
+  const cadChip=c("cad");
+  const acs=c("cadAcs")||c("mi1y")||c("mi2");   // 心肌梗塞本身即為 ACS
+  const cad=cadChip||acs||c("revasc")||c("mi1y")||c("mi2")||c("multi");
   return {sex,age:num("age"),ldl:num("ldl"),tc:num("tc"),hdl:num("hdl"),tg:num("tg"),
     cad, pad:c("pad"), carotid:c("carotid"), stroke:c("stroke"),
-    acs:c("acs"), revasc:c("revasc"), mi1y:c("mi1y"), mi2:c("mi2"), multi:c("multi"),
+    acs, revasc:c("revasc"), mi1y:c("mi1y"), mi2:c("mi2"), multi:c("multi"),
     dm:c("dm"), ckd:c("ckd"), cac400:c("cac400"), ldlEver190:c("ldl190"),
     // 表一非常高風險(二)：僅影像確認 ≧50% 狹窄算數，負荷性試驗不算
-    img50: (cadChip&&basis==="img")||c("pad")||c("carotid"),
+    img50: (cadChip&&c("cadImg"))||c("pad")||c("carotid"),
     strokeAthero: c("stroke"),
     padEv: c("pad"),
     htn:on("htn"),famhx:on("famhx"),smoke:on("smoke"),meno:on("meno"),
@@ -630,7 +631,9 @@ function render(){
     c.setAttribute("aria-pressed",String(c.dataset.id==="__none"?!any:!!cond[c.dataset.id])));
   $("cadSub").classList.toggle("hidden",!cond.cad);
   document.querySelectorAll("#cadBasis .chip").forEach(c=>
-    c.setAttribute("aria-pressed",String((cond.cadBasis||"img")===c.dataset.v)));
+    c.setAttribute("aria-pressed",String(c.dataset.id==="cadAcs"
+      ? !!(cond.cadAcs||cond.mi1y||cond.mi2)
+      : !!cond[c.dataset.id])));
   document.querySelectorAll("#cadEvents .chip").forEach(c=>
     c.setAttribute("aria-pressed",String(!!cond[c.dataset.id])));
 
@@ -751,14 +754,17 @@ function render(){
     else{
       cond[id]=!cond[id];
       // 取消冠狀動脈疾病時一併清掉底下的認定依據與合併狀況，避免留下看不見的條件
-      if(id==="cad"&&!cond.cad){delete cond.cadBasis;CADEVENTS.forEach(e=>delete cond[e.id]);}
+      if(id==="cad"){
+        if(cond.cad)cond.cadImg=true;               // 開啟時預設以影像認定
+        else{CADBASIS.concat(CADEVENTS).forEach(e=>delete cond[e.id]);}
+      }
     }
     render();
   }));
 
-  $("cadBasis").innerHTML=CADBASIS.map(b=>'<button type="button" class="chip" data-v="'+b.v+'" aria-pressed="false">'+b.label+'</button>').join("");
+  $("cadBasis").innerHTML=CADBASIS.map(b=>'<button type="button" class="chip" data-id="'+b.id+'" aria-pressed="false">'+b.label+'</button>').join("");
   document.querySelectorAll("#cadBasis .chip").forEach(c=>
-    c.addEventListener("click",()=>{cond.cadBasis=c.dataset.v;render();}));
+    c.addEventListener("click",()=>{cond[c.dataset.id]=!cond[c.dataset.id];render();}));
 
   $("cadEvents").innerHTML=CADEVENTS.map(e=>'<button type="button" class="chip" data-id="'+e.id+'" aria-pressed="false">'+e.label+'</button>').join("");
   document.querySelectorAll("#cadEvents .chip").forEach(c=>
