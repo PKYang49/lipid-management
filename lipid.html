@@ -386,7 +386,6 @@ details.more .dc{padding:0 10px 10px}
             <dl class="v-grid">
               <dt>起始門檻</dt><dd id="nStart">—</dd>
               <dt>LDL-C 目標</dt><dd class="big" id="nTarget">—</dd>
-              <dt>non-HDL-C</dt><dd id="nNonHdl">—</dd>
             </dl>
             <div id="nStatus"></div>
           </div>
@@ -769,7 +768,6 @@ function render(){
   $("nBasis").textContent=nl.why;
   $("nStart").textContent="LDL-C ≧"+N.ldl+" mg/dL";
   $("nTarget").innerHTML='&lt; '+N.ldl+' <span style="font-size:12px;font-weight:400;color:var(--ink-3)">mg/dL</span>';
-  $("nNonHdl").innerHTML=N.nhdl?('&lt; '+N.nhdl+(nonHdl!==null?' <span style="color:var(--ink-3);font-size:12px">（現值 '+nonHdl+'）</span>':'')):'—';
   $("nStatus").innerHTML=statusEl(s.ldl,N.ldl);
 
   $("oLevel").textContent=O.name;
