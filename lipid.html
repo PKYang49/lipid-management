@@ -156,6 +156,8 @@ legend{
 .v-grid dd{margin:0;font-variant-numeric:tabular-nums}
 .big{font-size:19px;font-weight:650;font-variant-numeric:tabular-nums}
 .status{display:inline-flex;gap:6px;margin-top:13px;padding:6px 10px;border-radius:2px;font-size:12.5px;font-weight:600}
+.status-group{display:flex;flex-wrap:wrap;gap:6px;margin-top:13px}
+.status-group .status{margin-top:0}
 .status.ok{background:var(--ok-soft);color:var(--ok)}
 .status.bad{background:var(--bad-soft);color:var(--bad)}
 .status.na{background:var(--bad-soft);border:1px solid var(--bad);color:var(--bad);font-weight:700}
@@ -676,12 +678,12 @@ function oldLevel(s){
   if(f.length===1)return {k:"D",why:"1 個危險因子："+f[0]};
   return {k:"E",why:"未計得危險因子"};
 }
-function statusEl(cur,target){
-  if(cur===null)return '<div class="status na" role="alert">⚠︎ 未輸入 LDL-C</div>';
+function statusEl(cur,target,label="LDL-C"){
+  if(cur===null)return '<div class="status na" role="alert">⚠︎ 未輸入 '+label+'</div>';
   const d=cur-target;
-  if(d<0)return '<div class="status ok">已達標　'+cur+' &lt; '+target+'</div>';
+  if(d<0)return '<div class="status ok">'+label+' 已達標　'+cur+' &lt; '+target+'</div>';
   const gap=Math.floor(d+1);
-  return '<div class="status bad">未達標　差 '+gap+' mg/dL</div>';
+  return '<div class="status bad">'+label+' 未達標　差 '+gap+' mg/dL</div>';
 }
 const fmtDate=d=>(d.getMonth()+1)+"/"+d.getDate();
 const plusWeeks=w=>{const d=new Date();d.setDate(d.getDate()+w*7);return d;};
@@ -768,14 +770,17 @@ function render(){
   $("nBasis").textContent=nl.why;
   $("nStart").textContent="LDL-C ≧"+N.ldl+" mg/dL";
   $("nTarget").innerHTML='&lt; '+N.ldl+' <span style="font-size:12px;font-weight:400;color:var(--ink-3)">mg/dL</span>';
-  $("nStatus").innerHTML=statusEl(s.ldl,N.ldl);
+  $("nStatus").innerHTML=statusEl(s.ldl,N.ldl,"LDL-C");
 
   $("oLevel").textContent=O.name;
   $("oBasis").textContent=ol.why;
   $("oStart").textContent=O.start;
   $("oTarget").innerHTML='&lt; '+O.ldl+' <span style="font-size:12px;font-weight:400;color:var(--ink-3)">mg/dL</span>';
   $("oTc").innerHTML=O.tc?('&lt; '+O.tc+(s.tc!==null?' <span style="color:var(--ink-3);font-size:12px">（現值 '+s.tc+'）</span>':'')):'—';
-  $("oStatus").innerHTML=statusEl(s.ldl,O.ldl);
+  $("oStatus").innerHTML='<div class="status-group">'+
+    statusEl(s.ldl,O.ldl,"LDL-C")+
+    (O.tc!==null?statusEl(s.tc,O.tc,"TC"):"")+
+    '</div>';
 
   const gap=O.ldl-N.ldl;
   $("deltaBox").innerHTML='<div class="delta">'+(gap>0
